@@ -20,9 +20,9 @@ interface BalanceHistoryPoint {
 
 export function usePriceHistory(range: '1d' | '7d' | '30d' | '90d' = '7d') {
   const { data, error, isLoading, mutate } = useSWR(
-    `/api/charts/price-history?range=${range}`,
+    `/api/mexc/klines?range=${range}`,
     fetcher,
-    { refreshInterval: 60000 }
+    { refreshInterval: 30000 }
   );
 
   const points: PriceHistoryPoint[] = data?.data ?? [];
