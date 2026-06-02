@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { LiveHeroGrid } from '@/components/home/LiveHeroGrid';
-import { LiveMarketOverview } from '@/components/home/LiveMarketOverview';
+/* import { LiveMarketOverview } from '@/components/home/LiveMarketOverview'; */
 import { LiveTicker } from '@/components/home/LiveTicker';
 import { HeroPriceChart } from '@/components/home/HeroPriceChart';
 import { HomeRankedTables } from '@/components/home/HomeRankedTables';
@@ -155,16 +155,8 @@ export function HomePage({
 
               {heroData && <LiveHeroGrid initial={heroData} />}
 
-              <section className="space-y-3">
-                <h2 className="text-lg sm:text-xl font-bold text-foreground">Market Overview</h2>
-                {heroData ? (
-                  <LiveMarketOverview initial={heroData} />
-                ) : (
-                  <section className="rounded border border-dashed border-border p-5 text-sm text-muted-foreground text-center">
-                    Market data temporarily unavailable.
-                  </section>
-                )}
-              </section>
+              {/* Market Overview section removed */}
+              
 
               {/* Network Activity — commented: requires PCT/CEX wallet monitors to be seeded with addresses */}
               {/*
@@ -269,16 +261,8 @@ export function HomePage({
           {/* Supply Tab */}
           {activeTab === 'supply' && (
             <div className="space-y-6 sm:space-y-8 animate-in fade-in-0">
-              <section className="space-y-3">
-                <h2 className="text-xl sm:text-2xl font-bold text-foreground">Supply Metrics</h2>
-                {heroData ? (
-                  <LiveMarketOverview initial={heroData} />
-                ) : (
-                  <section className="rounded border border-dashed border-border p-5 text-sm text-muted-foreground text-center">
-                    Market data temporarily unavailable.
-                  </section>
-                )}
-              </section>
+              {/* Supply Metrics section removed */}
+              
               {heroData && <LiveHeroGrid initial={heroData} />}
             </div>
           )}
