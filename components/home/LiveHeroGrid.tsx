@@ -91,7 +91,7 @@ function MetricCard({
 export function LiveHeroGrid({ initial }: { initial: HeroData }) {
   const { data: liveStore, live, updatedAt } = useSharedHero(initial);
   const d = (liveStore ?? initial) as HeroData;
-  const { priceHistory } = usePriceHistory('1d');
+  const { priceHistory } = usePriceHistory('24H');
 
   const priceSparkline: SparklineDataPoint[] = useMemo(
     () => priceHistory.map((p) => ({ time: p.time, value: p.close })),

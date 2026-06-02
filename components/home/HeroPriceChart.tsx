@@ -12,8 +12,8 @@ import { fmtUsd, fmtMoneyCompact, formatChange } from '@/lib/format';
 const PriceChart = dynamic(() => import('@/components/charts/PriceChart'), { ssr: false });
 const TradingViewChart = dynamic(() => import('@/components/charts/TradingViewChart'), { ssr: false });
 
-type Range = '1d' | '7d' | '30d' | '90d';
-const RANGES: Range[] = ['1d', '7d', '30d', '90d'];
+type Range = '24H' | '7D' | '1M' | '3M';
+const RANGES: Range[] = ['24H', '7D', '1M', '3M'];
 
 export type HeroPriceData = {
   priceUsd: number;
@@ -28,13 +28,13 @@ export type HeroPriceData = {
 const MAX_LIVE_POINTS = 400;
 
 interface LivePoint {
-  time: number; // unix seconds
+  time: number;
   value: number;
 }
 
 export function HeroPriceChart({ initial }: { initial: HeroPriceData }) {
-  const [range, setRange] = useState<Range>('1d');
-  const { data: liveStore, live, updatedAt: heroUpdatedAt } = useSharedHero(initial);
+  const [range, setRange] = useState<Range>('7D');
+  const { data: liveStore, live } = useSharedHero(initial);
   const d = (liveStore ?? initial) as HeroPriceData;
   const { priceHistory, loading } = usePriceHistory(range);
   const hasHistory = !loading && priceHistory.length > 0;
@@ -123,7 +123,7 @@ export function HeroPriceChart({ initial }: { initial: HeroPriceData }) {
                     : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
                 }`}
               >
-                {r.toUpperCase()}
+                {r}
               </button>
             ))}
           </div>
@@ -137,7 +137,7 @@ export function HeroPriceChart({ initial }: { initial: HeroPriceData }) {
             </div>
           </div>
         ) : hasHistory ? (
-          <PriceChart data={priceHistory} height={320} showVolume legend="PI/USD" />
+          <PriceChart data={priceHistory} height={320} showVolume={false} legend="PI/USD" />
         ) : livePoints.length >= 2 ? (
           <div className="h-80 border border-dashed border-border rounded-lg p-4">
             <LiveAreaChart points={livePoints} />

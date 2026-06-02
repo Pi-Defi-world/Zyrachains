@@ -2,52 +2,75 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const MEXC_BASE = 'https://api.mexc.com/api/v3/klines';
 
-// Map UI range to MEXC interval + limit for a good chart
 const INTERVAL_MAP: Record<string, { interval: string; limit: number }> = {
-  '1d':  { interval: '15m', limit: 96 },   // 24h of 15min candles
-  '7d':  { interval: '1h',  limit: 168 },  // 7d of 1h candles
-  '30d': { interval: '4h',  limit: 180 },  // 30d of 4h candles
-  '90d': { interval: '1d',  limit: 90 },   // 90d of daily candles
+  '24H': { interval: '15m', limit: 96 },
+  '7D':  { interval: '60m', limit: 168 },
+  '1M':  { interval: '4h',  limit: 180 },
+  '3M':  { interval: '1d',  limit: 90 },
 };
 
-interface MexcKline {
-  0: number; // open time (ms)
-  1: string; // open
-  2: string; // high
-  3: string; // low
-  4: string; // close
-  5: string; // volume
-  6: number; // close time (ms)
-  7: string; // quote volume
+interface KlinePoint {
+  time: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
 }
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 30; // 30s cache
+export const revalidate = 30;
 
-export async function GET(request: NextRequest) {
-  const range = request.nextUrl.searchParams.get('range') || '7d';
-  const config = INTERVAL_MAP[range] || INTERVAL_MAP['7d'];
+async function fetchMexcKlines(range: string): Promise<{ data: KlinePoint[]; source: string; error?: string }> {
+  const config = INTERVAL_MAP[range];
+  if (!config) return { data: [], source: 'empty', error: `Unknown range: ${range}` };
+
+  const url = `${MEXC_BASE}?symbol=PIUSDT&interval=${config.interval}&limit=${config.limit}`;
 
   try {
-    const url = `${MEXC_BASE}?symbol=PIUSDT&interval=${config.interval}&limit=${config.limit}`;
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      headers: { 'Accept': 'application/json' },
+      signal: AbortSignal.timeout(8000),
+    });
+
     if (!res.ok) {
-      return NextResponse.json({ data: [], source: 'empty' }, { status: 200 });
+      const body = await res.text().catch(() => '');
+      return { data: [], source: 'empty', error: `MEXC HTTP ${res.status}: ${body.slice(0, 200)}` };
     }
 
-    const raw: MexcKline[] = await res.json();
+    const raw: unknown = await res.json();
 
-    const data = raw.map((k) => ({
-      time: Math.floor(k[0] / 1000), // unix seconds for lightweight-charts
-      open: parseFloat(k[1]),
-      high: parseFloat(k[2]),
-      low: parseFloat(k[3]),
-      close: parseFloat(k[4]),
-      volume: parseFloat(k[5]),
+    if (!Array.isArray(raw)) {
+      const err = raw as Record<string, unknown>;
+      return { data: [], source: 'empty', error: `MEXC error: ${err.code || ''} ${err.msg || JSON.stringify(err).slice(0, 200)}` };
+    }
+
+    const data = (raw as (string | number)[][]).map((k) => ({
+      time: Math.floor(Number(k[0]) / 1000),
+      open: parseFloat(String(k[1])),
+      high: parseFloat(String(k[2])),
+      low: parseFloat(String(k[3])),
+      close: parseFloat(String(k[4])),
+      volume: parseFloat(String(k[5])),
     }));
 
-    return NextResponse.json({ data, source: 'mexc' });
-  } catch {
-    return NextResponse.json({ data: [], source: 'error' }, { status: 200 });
+    if (data.length === 0) {
+      return { data: [], source: 'empty', error: 'MEXC returned empty kline array' };
+    }
+
+    return { data, source: 'mexc' };
+  } catch (e) {
+    return { data: [], source: 'error', error: `Fetch error: ${e instanceof Error ? e.message : String(e)}` };
   }
+}
+
+export async function GET(request: NextRequest) {
+  const range = request.nextUrl.searchParams.get('range') || '7D';
+  // Accept old names too
+  const mapped = range === '1d' ? '24H' : range === '7d' ? '7D' : range === '30d' ? '1M' : range === '90d' ? '3M' : range;
+  const result = await fetchMexcKlines(mapped || '7D');
+
+  console.log(`[mexc-klines] range=${range} → ${(result.data || []).length} candles, error=${result.error || 'none'}`);
+
+  return NextResponse.json(result);
 }

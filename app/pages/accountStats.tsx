@@ -23,7 +23,7 @@ const AccountStats: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [lastUpdated, setLastUpdated] = useState(new Date());
-  const [priceRange, setPriceRange] = useState<'1d' | '7d' | '30d' | '90d'>('7d');
+  const [priceRange, setPriceRange] = useState<'24H' | '7D' | '1M' | '3M'>('7D');
   const { priceHistory, loading: chartLoading } = usePriceHistory(priceRange);
 
   // Local state for data
@@ -227,7 +227,7 @@ const AccountStats: React.FC = () => {
               <span className="text-sm font-medium text-foreground">Pi Price Chart</span>
             </div>
             <div className="flex gap-1">
-              {(['1d', '7d', '30d', '90d'] as const).map((r) => (
+              {(['24H', '7D', '1M', '3M'] as const).map((r) => (
                 <button
                   key={r}
                   onClick={() => setPriceRange(r)}

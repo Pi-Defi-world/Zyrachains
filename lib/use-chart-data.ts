@@ -18,7 +18,7 @@ interface BalanceHistoryPoint {
   balance: number;
 }
 
-export function usePriceHistory(range: '1d' | '7d' | '30d' | '90d' = '7d') {
+export function usePriceHistory(range: '24H' | '7D' | '1M' | '3M' = '7D') {
   const { data, error, isLoading, mutate } = useSWR(
     `/api/mexc/klines?range=${range}`,
     fetcher,
