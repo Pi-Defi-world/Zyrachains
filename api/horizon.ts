@@ -928,7 +928,13 @@ export const horizon = {
   },
   getClaimEffect: async (link: string) => {
     try {
-      link=link.replace("http://","https://");
+      link = link.replace("http://","https://");
+      try {
+        const parsed = new URL(link);
+        link = parsed.pathname + parsed.search;
+      } catch {
+        link = link.substring(30);
+      }
       const response = await api_own.get(link);
       const data =response.data._embedded.records.find((record: any) => record.type === 'claimable_balance_claimed')
       if (data) {
