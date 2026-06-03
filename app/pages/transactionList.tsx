@@ -1,12 +1,11 @@
 "use client";
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect } from "react";
 import { useLanguage } from "@/context/languagecontext";
 import { usePageMetadata } from "@/context/pagemetadataContext";
 import { horizon } from "@/api/horizon";
-import TransactionFilter from "./TransactionFilter";
 import AccountLabel from "@/components/AccountLabel";
 import { Button } from "@/components/ui/button";
-import { Spinner } from "@/components/ui/spinner";
+import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import Link from "next/link";
@@ -41,6 +40,7 @@ const TransactionList: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
   const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [searchQuery, setSearchQuery] = useState("");
 
   const formatAmount = (raw: string | undefined): string => {
     if (!raw) return "\u2014";
@@ -113,6 +113,17 @@ const TransactionList: React.FC = () => {
     return `${diffInDays}d ago`;
   };
 
+  const filteredPayments = payments.filter((p) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      (p.transaction_hash || "").toLowerCase().includes(q) ||
+      (p.from || "").toLowerCase().includes(q) ||
+      (p.to || "").toLowerCase().includes(q) ||
+      (p.amount || "").includes(q)
+    );
+  });
+
   if (loading) {
     return (
       <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 max-w-7xl mx-auto">
@@ -139,9 +150,14 @@ const TransactionList: React.FC = () => {
         </div>
       </PageHeader>
 
-      <Suspense fallback={<div className="mb-4"><Spinner className="h-6 w-6" /></div>}>
-        <TransactionFilter />
-      </Suspense>
+      <div className="mb-4">
+        <Input
+          placeholder="Search by hash, address, or amount..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="max-w-md"
+        />
+      </div>
 
       <div className="overflow-x-auto rounded-lg border border-border">
         <Table>
@@ -155,14 +171,14 @@ const TransactionList: React.FC = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {payments.length === 0 ? (
+            {filteredPayments.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                  No transactions found.
+                  {searchQuery ? "No transactions match your search." : "No transactions found."}
                 </TableCell>
               </TableRow>
             ) : (
-              payments.map((p) => (
+              filteredPayments.map((p) => (
                 <TableRow key={p.id || `${p.transaction_hash}-${p.from}-${p.to}`}>
                   <TableCell className="font-mono text-xs">
                     {p.transaction_hash ? (
@@ -180,23 +196,21 @@ const TransactionList: React.FC = () => {
                     {p.from ? (
                       <AccountLabel account={p.from} shorten={true} />
                     ) : (
-                      <span className="text-muted-foreground text-xs">\u2014</span>
+                      <span className="text-muted-foreground text-xs">{"\u2014"}</span>
                     )}
                   </TableCell>
                   <TableCell className="max-w-[150px] truncate">
                     {p.to ? (
                       <AccountLabel account={p.to} shorten={true} />
                     ) : (
-                      <span className="text-muted-foreground text-xs">\u2014</span>
+                      <span className="text-muted-foreground text-xs">{"\u2014"}</span>
                     )}
                   </TableCell>
                   <TableCell className="text-right font-medium whitespace-nowrap">
                     {p.amount ? (
-                      <span>
-                        {formatAmount(p.amount)} \u03c0
-                      </span>
+                      <span>{formatAmount(p.amount)} {"\u03c0"}</span>
                     ) : (
-                      <span className="text-muted-foreground text-xs">\u2014</span>
+                      <span className="text-muted-foreground text-xs">{"\u2014"}</span>
                     )}
                   </TableCell>
                 </TableRow>

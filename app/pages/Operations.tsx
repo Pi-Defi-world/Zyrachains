@@ -11,9 +11,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ChevronLeft, ChevronRight, RefreshCw, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import AccountLabel from "@/components/AccountLabel";
-import { formatTime } from "@/utils/predicate";
 import { PageHeader } from "@/components/PageHeader";
 import { SkeletonTable } from "@/components/SkeletonTable";
+import { formatDistanceToNowWithLocale } from "@/utils/time";
 
 const OperationsPage: React.FC = () => {
   const { t, language } = useLanguage();
@@ -134,6 +134,22 @@ const OperationsPage: React.FC = () => {
     return `${diffInDays}d ago`;
   };
 
+  const renderTime = (createdAt: string | undefined): string => {
+    if (!createdAt) return "\u2014";
+    try {
+      return formatDistanceToNowWithLocale(new Date(createdAt), language);
+    } catch {
+      return createdAt;
+    }
+  };
+
+  const renderAccount = (from: string | undefined, to: string | undefined, sourceAccount: string | undefined): string | undefined => {
+    if (from) return from;
+    if (to) return to;
+    if (sourceAccount) return sourceAccount;
+    return undefined;
+  };
+
   const operationTypes = [...new Set(operations.map((op) => op.type))].sort();
 
   const filteredOperations = operations.filter((op) => {
@@ -142,7 +158,7 @@ const OperationsPage: React.FC = () => {
     const q = searchQuery.toLowerCase();
     return (
       (op.id || "").toLowerCase().includes(q) ||
-      (op.from || "").toLowerCase().includes(q) ||
+      (op.from || op.source_account || "").toLowerCase().includes(q) ||
       (op.to || "").toLowerCase().includes(q) ||
       (op.type || "").toLowerCase().includes(q) ||
       (op.transaction_hash || "").toLowerCase().includes(q)
@@ -224,32 +240,32 @@ const OperationsPage: React.FC = () => {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
-                    {formatTime(operation.created_at)}
+                    {renderTime(operation.created_at)}
                   </TableCell>
                   <TableCell className="max-w-[120px] sm:max-w-[180px] truncate">
-                    {operation.from ? (
-                      <AccountLabel account={operation.from} shorten={true} />
+                    {operation.from || operation.source_account ? (
+                      <AccountLabel account={operation.from || operation.source_account} shorten={true} />
                     ) : (
-                      <span className="text-muted-foreground text-xs">\u2014</span>
+                      <span className="text-muted-foreground text-xs">{'\u2014'}</span>
                     )}
                   </TableCell>
                   <TableCell className="max-w-[120px] sm:max-w-[180px] truncate">
                     {operation.to ? (
                       <AccountLabel account={operation.to} shorten={true} />
                     ) : (
-                      <span className="text-muted-foreground text-xs">\u2014</span>
+                      <span className="text-muted-foreground text-xs">{'\u2014'}</span>
                     )}
                   </TableCell>
                   <TableCell className="text-right whitespace-nowrap">
                     {operation.amount ? (
                       <span>
-                        <span className="font-medium">{formatAmount(parseFloat(operation.amount))} \u03c0</span>
+                        <span className="font-medium">{formatAmount(parseFloat(operation.amount))} {'\u03c0'}</span>
                         <span className="text-xs text-muted-foreground ml-1">
                           ({formatCurrency(parseFloat(operation.amount) * piPriceUSD)})
                         </span>
                       </span>
                     ) : (
-                      <span className="text-muted-foreground text-xs">\u2014</span>
+                      <span className="text-muted-foreground text-xs">{'\u2014'}</span>
                     )}
                   </TableCell>
                   <TableCell>
