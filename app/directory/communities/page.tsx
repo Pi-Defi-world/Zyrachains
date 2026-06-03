@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { AlertTriangle, ExternalLink, Users, Search } from 'lucide-react';
+import { AlertTriangle, ExternalLink, Users, Search, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { PageHeader } from '@/components/PageHeader';
 
@@ -17,6 +17,9 @@ interface CommunitySocialStats {
   telegramUsername: string | null;
   telegram: { memberCount?: number | null; title?: string } | null;
   telegramError?: string;
+  twitterUsername?: string | null;
+  twitter?: { followersCount?: number; username?: string } | null;
+  twitterError?: string;
 }
 
 interface CommunityListingRow {
@@ -26,6 +29,7 @@ interface CommunityListingRow {
   category: string;
   website?: string;
   telegram?: string;
+  twitter?: string;
   discord?: string;
   socialStats?: CommunitySocialStats;
 }
@@ -85,6 +89,11 @@ export default function DirectoryCommunitiesPage() {
     return sum + (typeof n === 'number' ? n : 0);
   }, 0);
 
+  const totalXFollowers = rows.reduce((sum, r) => {
+    const n = r.socialStats?.twitter?.followersCount;
+    return sum + (typeof n === 'number' ? n : 0);
+  }, 0);
+
   if (loading) {
     return (
       <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 max-w-7xl mx-auto">
@@ -129,7 +138,7 @@ export default function DirectoryCommunitiesPage() {
       </PageHeader>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 sm:mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
         <Card className="bg-card/80 backdrop-blur-sm border border-border/50">
           <CardContent className="p-4 sm:p-5">
             <p className="text-xs sm:text-sm text-muted-foreground">Listings</p>
@@ -138,15 +147,21 @@ export default function DirectoryCommunitiesPage() {
         </Card>
         <Card className="bg-card/80 backdrop-blur-sm border border-border/50">
           <CardContent className="p-4 sm:p-5">
-            <p className="text-xs sm:text-sm text-muted-foreground">Total members (loaded)</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">Total TG members</p>
             <p className="text-xl sm:text-2xl font-bold text-foreground">{totalMembers.toLocaleString()}</p>
           </CardContent>
         </Card>
         <Card className="bg-card/80 backdrop-blur-sm border border-border/50">
           <CardContent className="p-4 sm:p-5">
-            <p className="text-xs sm:text-sm text-muted-foreground">With Telegram</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">Total X followers</p>
+            <p className="text-xl sm:text-2xl font-bold text-foreground">{totalXFollowers.toLocaleString()}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-card/80 backdrop-blur-sm border border-border/50">
+          <CardContent className="p-4 sm:p-5">
+            <p className="text-xs sm:text-sm text-muted-foreground">Social handles</p>
             <p className="text-xl sm:text-2xl font-bold text-foreground">
-              {rows.filter((r) => r.socialStats?.telegramUsername).length}
+              {rows.filter((r) => r.socialStats?.telegramUsername || r.socialStats?.twitterUsername).length}
             </p>
           </CardContent>
         </Card>
@@ -209,22 +224,26 @@ export default function DirectoryCommunitiesPage() {
                   <TableRow>
                     <TableHead>Community</TableHead>
                     <TableHead>Category</TableHead>
-                    <TableHead>Members</TableHead>
+                    <TableHead>TG Members</TableHead>
+                    <TableHead>X Followers</TableHead>
                     <TableHead className="w-[140px]">Links</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredRows.map((r) => {
-                    const user = r.socialStats?.telegramUsername;
+                    const tgUser = r.socialStats?.telegramUsername;
                     const members = r.socialStats?.telegram?.memberCount;
-                    const err = r.socialStats?.telegramError;
+                    const tgErr = r.socialStats?.telegramError;
+                    const twHandle = r.socialStats?.twitterUsername;
+                    const xFollowers = r.socialStats?.twitter?.followersCount;
+                    const twErr = r.socialStats?.twitterError;
                     return (
                       <TableRow key={r._id} className="hover:bg-muted/50">
                         <TableCell>
                           <div className="font-medium text-foreground">{r.name}</div>
                           <div className="text-xs text-muted-foreground line-clamp-2 max-w-[280px]">{r.description}</div>
-                          {err && user && (
-                            <div className="text-xs text-amber-600 dark:text-amber-400 mt-1">{err}</div>
+                          {(tgErr || twErr) && (
+                            <div className="text-xs text-amber-600 dark:text-amber-400 mt-1">{tgErr || twErr}</div>
                           )}
                         </TableCell>
                         <TableCell>
@@ -235,20 +254,40 @@ export default function DirectoryCommunitiesPage() {
                             <Users className="h-4 w-4 text-muted-foreground shrink-0" />
                             {typeof members === 'number' ? (
                               <span className="font-medium">{members.toLocaleString()}</span>
-                            ) : user ? (
+                            ) : tgUser ? (
                               <span className="text-muted-foreground text-sm">—</span>
                             ) : (
-                              <span className="text-muted-foreground text-sm">No Telegram</span>
+                              <span className="text-muted-foreground text-sm">N/A</span>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            <TrendingUp className="h-4 w-4 text-muted-foreground shrink-0" />
+                            {typeof xFollowers === 'number' ? (
+                              <span className="font-medium">{xFollowers.toLocaleString()}</span>
+                            ) : twHandle ? (
+                              <span className="text-muted-foreground text-sm">—</span>
+                            ) : (
+                              <span className="text-muted-foreground text-sm">N/A</span>
                             )}
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-col gap-1">
-                            {user && (
+                            {tgUser && (
                               <Button variant="outline" size="sm" className="h-7 text-xs" asChild>
-                                <a href={`https://t.me/${user}`} target="_blank" rel="noopener noreferrer">
+                                <a href={`https://t.me/${tgUser}`} target="_blank" rel="noopener noreferrer">
                                   <ExternalLink className="h-3 w-3 mr-1" />
                                   Telegram
+                                </a>
+                              </Button>
+                            )}
+                            {twHandle && (
+                              <Button variant="outline" size="sm" className="h-7 text-xs" asChild>
+                                <a href={`https://x.com/${twHandle}`} target="_blank" rel="noopener noreferrer">
+                                  <ExternalLink className="h-3 w-3 mr-1" />
+                                  X
                                 </a>
                               </Button>
                             )}

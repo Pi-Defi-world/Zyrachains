@@ -260,11 +260,11 @@ const TransactionsFilter: React.FC = () => {
 
   return (
     <div className="transactions-filter-page px-4 sm:px-6 lg:px-8">
-      <Card className="mb-4">
-        <CardContent className="p-6">
+      <Card className="mb-4 overflow-hidden">
+        <CardContent className="p-4 sm:p-6">
           <h5 className="text-lg font-medium mb-4">{String(t("transactions_filter.filter_options", { defaultValue: "Filter Options" }))}</h5>
           <form onSubmit={handleApplyFilters}>
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
               <div className="md:col-span-4">
                 <div className="mb-3">
                   <label htmlFor="filterAddress" className="block text-sm font-medium mb-1">
@@ -344,11 +344,11 @@ const TransactionsFilter: React.FC = () => {
                   )}
                 </div>
               </div>
-              <div className="md:col-span-2 flex items-end mb-3 gap-2">
-                <Button variant="default" type="submit" className="flex-1">
+              <div className="md:col-span-2 flex flex-wrap items-end mb-3 gap-2 min-w-0">
+                <Button variant="default" type="submit" className="flex-1 min-w-[70px] whitespace-nowrap">
                   {t("transactions_filter.apply_filters", { defaultValue: "Apply" })}
                 </Button>
-                <Button variant="outline" type="button" onClick={handleClearFilters} className="flex-1">
+                <Button variant="outline" type="button" onClick={handleClearFilters} className="flex-1 min-w-[70px] whitespace-nowrap">
                   {t("transactions_filter.clear", { defaultValue: "Clear" })}
                 </Button>
               </div>

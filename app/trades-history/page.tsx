@@ -25,13 +25,15 @@ export default function TradesHistory() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [trades, setTrades] = useState<Trade[]>([]);
 
-  const handleLoad = useCallback((data: TradesApiResponse) => {
-    const records = data._embedded?.records || [];
-    setTrades(records);
-    const total = records.length;
-    const volume = records.reduce((s, t) => s + parseFloat(t.base_amount || "0") + parseFloat(t.counter_amount || "0"), 0);
-    const tradesWithPrice = records.filter((t) => t.price?.n && t.price?.d).length;
-    setStats({ total, volume, tradesWithPrice });
+  const handleLoad = useCallback((data: TradesApiResponse, isInitial: boolean) => {
+    if (isInitial) {
+      const records = data._embedded?.records || [];
+      setTrades(records);
+      const total = records.length;
+      const volume = records.reduce((s, t) => s + parseFloat(t.base_amount || "0") + parseFloat(t.counter_amount || "0"), 0);
+      const tradesWithPrice = records.filter((t) => t.price?.n && t.price?.d).length;
+      setStats({ total, volume, tradesWithPrice });
+    }
     setInitialLoading(false);
   }, []);
 

@@ -8,12 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ChevronLeft, ChevronRight, RefreshCw, Activity, ArrowRight, Filter } from "lucide-react";
+import { ChevronLeft, ChevronRight, RefreshCw, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import AccountLabel from "@/components/AccountLabel";
 import { formatTime } from "@/utils/predicate";
 import { PageHeader } from "@/components/PageHeader";
-import { SummaryStats } from "@/components/SummaryStats";
 import { SkeletonTable } from "@/components/SkeletonTable";
 
 const OperationsPage: React.FC = () => {
@@ -67,7 +66,6 @@ const OperationsPage: React.FC = () => {
     }
   };
 
-  // Fetch Pi price
   const fetchPiPrice = async () => {
     try {
       try {
@@ -87,7 +85,6 @@ const OperationsPage: React.FC = () => {
     }
   };
 
-  // Initial data fetch
   useEffect(() => {
     const fetchInitialData = async () => {
       setLoading(true);
@@ -97,7 +94,6 @@ const OperationsPage: React.FC = () => {
     fetchInitialData();
   }, []);
 
-  // Manual refresh function
   const handleRefresh = async () => {
     await Promise.all([fetchOperations(), fetchPiPrice()]);
   };
@@ -153,9 +149,6 @@ const OperationsPage: React.FC = () => {
     );
   });
 
-  const amountOps = operations.filter((op) => op.amount);
-  const totalPi = amountOps.reduce((sum, op) => sum + parseFloat(op.amount || "0") / 10_000_000, 0);
-
   if (loading) {
     return (
       <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10 max-w-7xl mx-auto">
@@ -182,16 +175,6 @@ const OperationsPage: React.FC = () => {
         </div>
       </PageHeader>
 
-      <SummaryStats
-        stats={[
-          { label: "Total Operations", value: operations.length.toLocaleString(), icon: <Activity className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> },
-          { label: "Types", value: operationTypes.length.toLocaleString(), icon: <Filter className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> },
-          { label: "Pi Transacted", value: `${formatAmount(totalPi)} π`, icon: <Activity className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> },
-          { label: "Pi Price", value: piPriceUSD > 0 ? formatCurrency(piPriceUSD) : "—", icon: <Activity className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> },
-        ]}
-      />
-
-      {/* Search + Type Filter */}
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <Input
           placeholder="Search by ID, account, or hash..."
@@ -213,7 +196,6 @@ const OperationsPage: React.FC = () => {
         )}
       </div>
 
-      {/* Operations Table */}
       <div className="overflow-x-auto rounded-lg border border-border">
         <Table>
           <TableHeader>
@@ -248,26 +230,26 @@ const OperationsPage: React.FC = () => {
                     {operation.from ? (
                       <AccountLabel account={operation.from} shorten={true} />
                     ) : (
-                      <span className="text-muted-foreground text-xs">—</span>
+                      <span className="text-muted-foreground text-xs">\u2014</span>
                     )}
                   </TableCell>
                   <TableCell className="max-w-[120px] sm:max-w-[180px] truncate">
                     {operation.to ? (
                       <AccountLabel account={operation.to} shorten={true} />
                     ) : (
-                      <span className="text-muted-foreground text-xs">—</span>
+                      <span className="text-muted-foreground text-xs">\u2014</span>
                     )}
                   </TableCell>
                   <TableCell className="text-right whitespace-nowrap">
                     {operation.amount ? (
                       <span>
-                        <span className="font-medium">{formatAmount(parseFloat(operation.amount) / 10_000_000)} π</span>
+                        <span className="font-medium">{formatAmount(parseFloat(operation.amount))} \u03c0</span>
                         <span className="text-xs text-muted-foreground ml-1">
-                          ({formatCurrency((parseFloat(operation.amount) / 10_000_000) * piPriceUSD)})
+                          ({formatCurrency(parseFloat(operation.amount) * piPriceUSD)})
                         </span>
                       </span>
                     ) : (
-                      <span className="text-muted-foreground text-xs">—</span>
+                      <span className="text-muted-foreground text-xs">\u2014</span>
                     )}
                   </TableCell>
                   <TableCell>
@@ -284,7 +266,6 @@ const OperationsPage: React.FC = () => {
         </Table>
       </div>
 
-      {/* Pagination */}
       <div className="flex items-center justify-between mt-6">
         <div className="text-sm text-muted-foreground">Page {currentPage}</div>
         <div className="flex items-center space-x-2">

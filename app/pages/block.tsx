@@ -23,6 +23,34 @@ const BlocksPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [lastUpdated, setLastUpdated] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState("");
+  const [aggregateStats, setAggregateStats] = useState({ totalBlocks: 0, totalTxs: 0, totalOps: 0 });
+
+  const computeStatsFromRecords = (records: any[]) => {
+    const totalTxs = records.reduce((sum, b) => sum + (b.successful_transaction_count || 0), 0);
+    const totalOps = records.reduce((sum, b) => sum + (b.operation_count || 0), 0);
+    setAggregateStats({ totalBlocks: records.length, totalTxs, totalOps });
+  };
+
+  const fetchStats = async () => {
+    try {
+      const apiUrl = 'https://api.mainnet.minepi.com/ledgers?order=desc&limit=100';
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+      const records = data._embedded?.records || [];
+      if (records.length > 0) {
+        computeStatsFromRecords(records);
+        return;
+      }
+    } catch { /* fallback */ }
+
+    try {
+      const r = await fetch('/api/v2/home/latest-blocks');
+      const j = await r.json();
+      if (j.success && j.data?.records?.length) {
+        computeStatsFromRecords(j.data.records);
+      }
+    } catch { /* silent */ }
+  };
 
   // Fetch blocks data
   const fetchBlocks = async (link = "", page = 1) => {
@@ -70,7 +98,7 @@ const BlocksPage: React.FC = () => {
   useEffect(() => {
     const fetchInitialData = async () => {
       setLoading(true);
-      await fetchBlocks();
+      await Promise.all([fetchBlocks(), fetchStats()]);
       setLoading(false);
     };
     fetchInitialData();
@@ -78,7 +106,7 @@ const BlocksPage: React.FC = () => {
 
   // Manual refresh function
   const handleRefresh = async () => {
-    await fetchBlocks();
+    await Promise.all([fetchBlocks(), fetchStats()]);
   };
 
   useEffect(() => {
@@ -112,9 +140,6 @@ const BlocksPage: React.FC = () => {
     const diffInDays = Math.floor(diffInHours / 24);
     return `${diffInDays}d ago`;
   };
-
-  const totalTxCount = blocks.reduce((sum, b) => sum + (b.successful_transaction_count || 0), 0);
-  const totalOpsCount = blocks.reduce((sum, b) => sum + (b.operation_count || 0), 0);
 
   const filteredBlocks = blocks.filter((block) => {
     if (!searchQuery) return true;
@@ -158,9 +183,9 @@ const BlocksPage: React.FC = () => {
 
       <SummaryStats
         stats={[
-          { label: "Total Blocks", value: blocks.length.toLocaleString(), icon: <Layers className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> },
-          { label: "Total Txs", value: totalTxCount.toLocaleString(), icon: <FileText className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> },
-          { label: "Total Ops", value: totalOpsCount.toLocaleString(), icon: <Hash className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> },
+          { label: "Total Blocks", value: aggregateStats.totalBlocks.toLocaleString(), icon: <Layers className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> },
+          { label: "Total Txs", value: aggregateStats.totalTxs.toLocaleString(), icon: <FileText className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> },
+          { label: "Total Ops", value: aggregateStats.totalOps.toLocaleString(), icon: <Hash className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> },
           { label: "Latest Block", value: blocks.length > 0 ? `#${blocks[0].sequence}` : "—", icon: <Clock className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> },
         ]}
       />

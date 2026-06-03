@@ -270,6 +270,23 @@ export class ApiClient {
   async getPctAggregateBalanceHistory(range: '1d' | '7d' | '30d' = '7d'): Promise<ApiResponse> {
     return this.request(`/api/pct-monitor/aggregate-balance-history?range=${range}`);
   }
+
+  // ---- Community follower endpoints ----
+
+  /** Follower history time-series for a specific X handle */
+  async getCommunityFollowerHistory(handle: string, range: '1d' | '7d' | '30d' | '90d' = '7d'): Promise<ApiResponse> {
+    return this.request(`/api/community-followers/history?handle=${encodeURIComponent(handle)}&range=${range}`);
+  }
+
+  /** Current stats + growth metrics for a specific X handle */
+  async getCommunityFollowerStats(handle: string): Promise<ApiResponse> {
+    return this.request(`/api/community-followers/stats?handle=${encodeURIComponent(handle)}`);
+  }
+
+  /** Overview of all tracked communities with live follower counts and growth */
+  async getCommunityOverview(): Promise<ApiResponse> {
+    return this.request('/api/community-followers/overview');
+  }
 }
 
 // Create and export a singleton instance

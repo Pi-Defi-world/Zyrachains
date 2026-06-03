@@ -15,7 +15,7 @@ interface Trade {
 interface TradesApiResponse { _links: { self: { href: string }; next?: { href: string }; prev?: { href: string } }; _embedded: { records: Trade[] } }
 
 interface TradesHistoryTabProps {
-  onLoad?: (data: TradesApiResponse) => void;
+  onLoad?: (data: TradesApiResponse, isInitial: boolean) => void;
 }
 
 export default function TradesHistoryTab({ onLoad }: TradesHistoryTabProps) {
@@ -39,7 +39,7 @@ export default function TradesHistoryTab({ onLoad }: TradesHistoryTabProps) {
   };
   const setCached = (key: string, data: any) => { try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data })); } catch {} };
 
-  useEffect(() => { fetchTrades(); }, []);
+  useEffect(() => { fetchTrades(undefined, true); }, []);
   useEffect(() => {
     if (tradesData?._embedded?.records) {
       const filtered = tradesData._embedded.records.filter(trade =>
@@ -52,7 +52,7 @@ export default function TradesHistoryTab({ onLoad }: TradesHistoryTabProps) {
     }
   }, [tradesData, searchQuery]);
 
-  const fetchTrades = async (url?: string) => {
+  const fetchTrades = async (url?: string, isInitial = false) => {
     try {
       setLoading(true);
       if (!url) {
@@ -65,7 +65,7 @@ export default function TradesHistoryTab({ onLoad }: TradesHistoryTabProps) {
               _links: j.data.horizonLinks || { self: { href: '' } },
             } as TradesApiResponse;
             setTradesData(payload);
-            onLoad?.(payload);
+            if (isInitial) onLoad?.(payload, true);
             setLoading(false);
             return;
           }
@@ -77,13 +77,13 @@ export default function TradesHistoryTab({ onLoad }: TradesHistoryTabProps) {
       const apiUrl = url || 'https://api.mainnet.minepi.com/trades?limit=50&order=desc';
       const cacheKey = `trades_${btoa(apiUrl)}`;
       const cached = getCached(cacheKey);
-      if (cached) { setTradesData(cached); onLoad?.(cached); setLoading(false); return; }
+      if (cached) { setTradesData(cached); if (isInitial) onLoad?.(cached, true); setLoading(false); return; }
       const response = await fetch(apiUrl);
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
       const data = await response.json();
       setCached(cacheKey, data);
       setTradesData(data);
-      onLoad?.(data);
+      if (isInitial) onLoad?.(data, true);
     } catch (err) {
       setError(`Failed to fetch trades data: ${err instanceof Error ? err.message : String(err)}`);
     } finally { setLoading(false); }
