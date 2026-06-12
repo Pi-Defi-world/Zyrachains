@@ -59,7 +59,7 @@ const ApiDocumentationPage: React.FC = () => {
   const { setHeading, setTitle, setDescription } = usePageMetadata();
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
-  const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://api.zyrachain.org';
+   const apiBase = process.env.NEXT_PUBLIC_API_URL || 'https://api.zyrachain.org';
 
   React.useEffect(() => {
     setHeading('API Documentation');
