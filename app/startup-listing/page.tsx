@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { usePageMetadata } from "@/context/pagemetadataContext";
 import { usePiNetwork } from '@/context/PiNetworkContext';
+import { LISTING_PAYMENTS } from '@/lib/pi-network';
 
 interface StartupFormData {
   name: string;
@@ -129,7 +130,7 @@ const StartupListingPage: React.FC = () => {
     'Idea Stage', 'Prototype', 'MVP', 'Beta Testing', 'Pre-Launch', 'Early Access'
   ];
 
-  const startupPrice = piListingPaymentService.getListingPrice('startup');
+  const startupPrice = LISTING_PAYMENTS.startup.amount;
 
   // Payment processing state
   if (submitStatus === 'payment') {

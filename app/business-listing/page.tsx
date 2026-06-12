@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { usePageMetadata } from "@/context/pagemetadataContext";
 import { usePiNetwork } from '@/context/PiNetworkContext';
+import { LISTING_PAYMENTS } from '@/lib/pi-network';
 
 interface BusinessFormData {
   name: string;
@@ -138,7 +139,7 @@ const BusinessListingPage: React.FC = () => {
     'Transportation', 'Agriculture', 'Non-Profit', 'Government', 'Other'
   ];
 
-  const businessPrice = piListingPaymentService.getListingPrice('business');
+  const businessPrice = LISTING_PAYMENTS.business.amount;
 
   // Payment processing state
   if (submitStatus === 'payment') {

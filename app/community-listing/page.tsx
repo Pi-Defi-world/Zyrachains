@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { usePageMetadata } from "@/context/pagemetadataContext";
 import { usePiNetwork } from '@/context/PiNetworkContext';
+import { LISTING_PAYMENTS } from '@/lib/pi-network';
 
 interface CommunityFormData {
   name: string;
@@ -125,7 +126,7 @@ const CommunityListingPage: React.FC = () => {
     'Regional', 'Educational', 'Business', 'Gaming', 'Other'
   ];
 
-  const communityPrice = piListingPaymentService.getListingPrice('community');
+  const communityPrice = LISTING_PAYMENTS.community.amount;
 
   // Payment processing state
   if (submitStatus === 'payment') {

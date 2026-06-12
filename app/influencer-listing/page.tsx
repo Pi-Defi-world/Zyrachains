@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { usePageMetadata } from "@/context/pagemetadataContext";
 import { usePiNetwork } from '@/context/PiNetworkContext';
+import { LISTING_PAYMENTS } from '@/lib/pi-network';
 
 interface InfluencerFormData {
   name: string;
@@ -125,7 +126,7 @@ const InfluencerListingPage: React.FC = () => {
     'Content Creation', 'Community Building', 'Other'
   ];
 
-  const influencerPrice = piListingPaymentService.getListingPrice('influencer');
+  const influencerPrice = LISTING_PAYMENTS.influencer.amount;
 
   // Payment processing state
   if (submitStatus === 'payment') {
