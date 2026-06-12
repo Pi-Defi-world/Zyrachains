@@ -39,6 +39,8 @@ interface PiNetworkContextType {
   // Authentication methods
   authenticate: () => Promise<PiAuthResult>;
   syncUser: () => Promise<void>;
+  refreshUser: () => Promise<void>;
+  ensurePiAuthentication: () => Promise<PiAuthResult>;
   logout: () => void;
   
   // Payment methods
@@ -93,13 +95,45 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
       
       if (savedToken && savedUser) {
         try {
-          // Since we're using Pi SDK authentication, we can trust the saved data
-          // The Pi SDK handles token validation internally
           const userData = JSON.parse(savedUser);
           setUser(userData);
           setAccessToken(savedToken);
           setIsAuthenticated(true);
           console.log('✅ Restored authentication from localStorage');
+
+          // Re-initialize Pi SDK so payments scope stays alive
+          if (typeof window !== 'undefined' && (window as any).Pi) {
+            try {
+              const isDev = process.env.NODE_ENV === 'development';
+              await (window as any).Pi.init({ version: "2.0", sandbox: isDev });
+              console.log('✅ Pi SDK re-initialized for existing auth');
+            } catch (initError) {
+              console.warn('⚠️ Pi SDK re-init failed:', initError);
+            }
+          }
+
+          // Re-verify with backend
+          try {
+            const resp = await fetch(`${SERVER_BASE_URL}/api/pi/auth/verify`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ accessToken: savedToken }),
+            });
+            if (resp.ok) {
+              const data = await resp.json();
+              if (data.user?._id) {
+                setUser(data.user);
+                localStorage.setItem('pi_user', JSON.stringify(data.user));
+              }
+            } else if (resp.status === 401) {
+              console.warn('⚠️ Access token expired, clearing auth');
+              localStorage.removeItem('pi_access_token');
+              localStorage.removeItem('pi_user');
+              setUser(null);
+              setAccessToken(null);
+              setIsAuthenticated(false);
+            }
+          } catch { /* use cached data */ }
         } catch (error) {
           console.error('Error restoring saved authentication:', error);
           localStorage.removeItem('pi_access_token');
@@ -119,64 +153,64 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
     setIsLoading(true);
     try {
       console.log('🔐 Starting authentication flow...');
-      
-      // Initialize Pi SDK directly
-      console.log('📦 Initializing Pi SDK...');
-      (window as any).Pi.init({ version: "2.0", sandbox: true });
-      
-      // Handle incomplete payments callback
-      const onIncompletePaymentFound = (payment: any) => {
+
+      const isDev = process.env.NODE_ENV === 'development';
+      console.log('📦 Initializing Pi SDK (sandbox:', isDev, ')');
+      await (window as any).Pi.init({ version: "2.0", sandbox: isDev });
+
+      const onIncompletePaymentFound = async (payment: any) => {
         console.log('⚠️ Incomplete payment found:', payment);
-        // Handle incomplete payment if needed
+        const paymentId = payment.identifier;
+        try {
+          await fetch(`${SERVER_BASE_URL}/api/pi/payments/cancel`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ paymentId })
+          });
+          console.log('✅ Incomplete payment cancelled:', paymentId);
+        } catch (err) {
+          console.error('Error cancelling incomplete payment:', err);
+        }
       };
-      
-      // Authenticate with Pi Network directly using Pi SDK
+
       console.log('🔑 Authenticating with Pi Network...');
       const auth = await (window as any).Pi.authenticate(
         ["username", "payments", "wallet_address"],
         onIncompletePaymentFound
       );
-      
-      console.log('✅ Pi authentication completed successfully');
-      
-      // Since Pi SDK already authenticates, we can trust the result
+
+      console.log('✅ Pi authentication completed — scopes:', auth.user.credentials?.scopes);
+
       const userData = auth.user;
-      
-      // Save authentication data locally
+
       setUser(userData);
       setAccessToken(auth.accessToken);
       setIsAuthenticated(true);
-      
-      // Store in localStorage
+
       localStorage.setItem('pi_access_token', auth.accessToken);
       localStorage.setItem('pi_user', JSON.stringify(userData));
-      
       console.log('💾 Authentication data saved to localStorage');
-      
-      // Verify token with the backend to create/update the user
+
+      // Verify token with backend
       try {
         const response = await fetch(`${SERVER_BASE_URL}/api/pi/auth/verify`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ accessToken: auth.accessToken }),
         });
 
         if (response.ok) {
           const backendResponse = await response.json();
-          // Optionally, update the user state with the data from our backend
           setUser(backendResponse.user);
           localStorage.setItem('pi_user', JSON.stringify(backendResponse.user));
-          console.log('✅ User verified and data synced with backend');
+          console.log('✅ User verified and synced with backend');
         } else {
-          const errorData = await response.json();
-          console.warn('⚠️ Backend verification failed, but authentication succeeded on frontend:', errorData.message);
+          console.warn('⚠️ Backend verification failed, using frontend auth only');
         }
       } catch (error) {
         console.error('⚠️ Backend verification request failed:', error);
       }
-      
+
       return auth;
     } catch (error) {
       console.error('Pi Network authentication failed:', error);
@@ -189,14 +223,12 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
   const syncUser = async (): Promise<void> => {
     const token = localStorage.getItem('pi_access_token');
     if (!token) return;
-
     try {
       const response = await fetch(`${SERVER_BASE_URL}/api/pi/auth/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ accessToken: token }),
       });
-
       if (response.ok) {
         const data = await response.json();
         if (data.user?._id) {
@@ -207,6 +239,53 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
     } catch (error) {
       console.error('User sync failed:', error);
     }
+  };
+
+  const refreshUser = async (): Promise<void> => {
+    const token = localStorage.getItem('pi_access_token');
+    if (!token) return;
+    try {
+      const resp = await fetch(`${SERVER_BASE_URL}/api/pi/auth/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accessToken: token }),
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.user?._id) {
+          setUser(data.user);
+          localStorage.setItem('pi_user', JSON.stringify(data.user));
+        }
+      } else if (resp.status === 401) {
+        logout();
+      }
+    } catch { /* silent */ }
+  };
+
+  const ensurePiAuthentication = async (): Promise<PiAuthResult> => {
+    if (typeof window === 'undefined' || !(window as any).Pi) {
+      throw new Error('Pi SDK not available. Please open in Pi Browser.');
+    }
+    const isDev = process.env.NODE_ENV === 'development';
+    await (window as any).Pi.init({ version: "2.0", sandbox: isDev });
+
+    const auth = await (window as any).Pi.authenticate(
+      ["username", "payments", "wallet_address"],
+      async (payment: any) => {
+        const paymentId = payment.identifier;
+        await fetch(`${SERVER_BASE_URL}/api/pi/payments/cancel`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentId })
+        });
+      }
+    );
+
+    setAccessToken(auth.accessToken);
+    setUser(auth.user);
+    localStorage.setItem('pi_access_token', auth.accessToken);
+    localStorage.setItem('pi_user', JSON.stringify(auth.user));
+    return auth;
   };
 
   const logout = () => {
@@ -282,8 +361,7 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
     setCurrentPaymentId(null);
 
     try {
-      // Initialize Pi SDK if not already done
-      (window as any).Pi.init({ version: "2.0" });
+      await ensurePiAuthentication();
 
       return new Promise((resolve) => {
         const callbacks = {
@@ -296,10 +374,7 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ paymentId })
               });
-
-              if (!response.ok) {
-                throw new Error('Payment approval failed');
-              }
+              if (!response.ok) throw new Error('Payment approval failed');
             } catch (error) {
               console.error('Payment approval error:', error);
             }
@@ -318,11 +393,7 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
                   listingType: paymentData.metadata?.listingType
                 })
               });
-
-              if (!response.ok) {
-                throw new Error('Payment completion failed');
-              }
-
+              if (!response.ok) throw new Error('Payment completion failed');
               resolve({ success: true, paymentId });
             } catch (error) {
               console.error('Payment completion error:', error);
@@ -339,13 +410,19 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
           },
 
           onError: (error: Error, payment?: any) => {
-            console.error('Payment error:', error, payment);
+            console.error('Payment error:', error?.message, payment);
             setIsPaymentInProgress(false);
-            resolve({ success: false, error: error.message || 'Payment failed' });
+            const msg = error?.message || 'Payment failed';
+            if (msg.includes('payments') && msg.includes('scope')) {
+              console.warn('⚠️ Payments scope missing — logging out to force re-auth');
+              logout();
+              resolve({ success: false, error: 'Payment permissions required. Please login again to enable payments.' });
+            } else {
+              resolve({ success: false, error: msg });
+            }
           }
         };
 
-        // Create the payment using Pi SDK
         (window as any).Pi.createPayment(paymentData, callbacks);
       });
 
@@ -366,6 +443,8 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
     isLoading,
     authenticate,
     syncUser,
+    refreshUser,
+    ensurePiAuthentication,
     logout,
     createListingPayment,
     createPayment,
