@@ -17,7 +17,7 @@ import {
   MessageCircle
 } from 'lucide-react';
 import { usePageMetadata } from "@/context/pagemetadataContext";
-import { piListingPaymentService, PiListingPaymentData } from '@/lib/pi-payment-frontend';
+import { usePiNetwork } from '@/context/PiNetworkContext';
 
 interface InfluencerFormData {
   name: string;
@@ -31,6 +31,7 @@ interface InfluencerFormData {
 
 const InfluencerListingPage: React.FC = () => {
   const { setHeading, setTitle, setDescription } = usePageMetadata();
+  const { isAuthenticated, user, authenticate, syncUser, createListingPayment } = usePiNetwork();
   const [formData, setFormData] = useState<InfluencerFormData>({
     name: '',
     bio: '',
@@ -71,7 +72,17 @@ const InfluencerListingPage: React.FC = () => {
     setPaymentStatus('processing');
 
     try {
-      // Prepare listing data - simplified structure
+      if (!isAuthenticated) {
+        await authenticate();
+        if (!isAuthenticated) {
+          setErrorMessage('Authentication required. Please connect your Pi wallet.');
+          setSubmitStatus('error');
+          setIsSubmitting(false);
+          return;
+        }
+      }
+      if (!user?._id) { await syncUser(); }
+
       const listingData = {
           name: formData.name,
           bio: formData.bio,
@@ -82,18 +93,12 @@ const InfluencerListingPage: React.FC = () => {
         instagram: formData.instagram || undefined
       };
 
-      // Prepare payment data
-      const paymentData: PiListingPaymentData = {
-        listingType: 'influencer',
-        listingData,
-        userInfo: {
-          email: formData.contactEmail,
-          name: formData.name
-        }
-      };
-
       // Process Pi payment
-      const paymentResult = await piListingPaymentService.createListingPayment(paymentData);
+      const paymentResult = await createListingPayment(
+        'influencer',
+        listingData,
+        { email: formData.contactEmail, name: formData.name }
+      );
 
       if (paymentResult.success) {
         setPaymentStatus('success');

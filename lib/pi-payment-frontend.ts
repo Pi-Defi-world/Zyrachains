@@ -61,9 +61,11 @@ export class PiListingPaymentService {
     });
 
     try {
-      console.log('🔧 Initializing Pi SDK...');
+      const isDev = typeof process !== 'undefined' && process.env.NODE_ENV === 'development';
+      console.log('🔧 Initializing Pi SDK (sandbox:', isDev, ')');
       await window.Pi.init({
-        version: "2.0"
+        version: "2.0",
+        sandbox: isDev
       });
       
       this.isInitialized = true;
@@ -125,10 +127,20 @@ export class PiListingPaymentService {
         const callbacks: PiPaymentCallbacks = {
           onReadyForServerApproval: async (paymentId: string) => {
             console.log('Payment ready for server approval:', paymentId);
-            // Note: The official Pi Network SDK handles approval automatically
-            // We don't need to call a server endpoint for approval
-            // The payment will proceed to onReadyForServerCompletion
-            console.log('✅ Payment approved by Pi Network automatically');
+            try {
+              const response = await fetch(`${SERVER_BASE_URL}/api/pi/payments/approve`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paymentId })
+              });
+              if (!response.ok) {
+                console.error('Payment approval failed:', await response.text());
+              } else {
+                console.log('✅ Payment approved by server');
+              }
+            } catch (error) {
+              console.error('Payment approval request failed:', error);
+            }
           },
 
           onReadyForServerCompletion: async (paymentId: string, txid: string) => {
@@ -200,17 +212,20 @@ export class PiListingPaymentService {
             
             // Enhanced error handling based on Pi SDK patterns
             let errorMessage = 'Payment failed';
+            const msg = error.message || '';
             
-            if (error.message.includes('insufficient_balance')) {
+            if (msg.includes('payments') && msg.includes('scope')) {
+              errorMessage = 'Payment permissions required. Please login again to enable payments.';
+            } else if (msg.includes('insufficient_balance')) {
               errorMessage = 'Insufficient Pi balance for this transaction';
-            } else if (error.message.includes('user_cancelled')) {
+            } else if (msg.includes('user_cancelled')) {
               errorMessage = 'Payment was cancelled by user';
-            } else if (error.message.includes('network_error')) {
+            } else if (msg.includes('network_error')) {
               errorMessage = 'Network error. Please check your connection and try again';
-            } else if (error.message.includes('payment_timeout')) {
+            } else if (msg.includes('payment_timeout')) {
               errorMessage = 'Payment timed out. Please try again';
-            } else if (error.message) {
-              errorMessage = error.message;
+            } else if (msg) {
+              errorMessage = msg;
             }
             
             resolve({ success: false, error: errorMessage });

@@ -17,7 +17,7 @@ import {
   MessageCircle
 } from 'lucide-react';
 import { usePageMetadata } from "@/context/pagemetadataContext";
-import { piListingPaymentService, PiListingPaymentData } from '@/lib/pi-payment-frontend';
+import { usePiNetwork } from '@/context/PiNetworkContext';
 
 interface UpdateFormData {
   projectName: string;
@@ -32,6 +32,7 @@ interface UpdateFormData {
 
 const UpdateListingPage: React.FC = () => {
   const { setHeading, setTitle, setDescription } = usePageMetadata();
+  const { isAuthenticated, user, authenticate, syncUser, createListingPayment } = usePiNetwork();
   const [formData, setFormData] = useState<UpdateFormData>({
     projectName: '',
     email: '',
@@ -88,7 +89,20 @@ const UpdateListingPage: React.FC = () => {
     setPaymentStatus('processing');
     
     try {
-      // Prepare listing data - simplified structure
+      if (!isAuthenticated) {
+        await authenticate();
+        if (!isAuthenticated) {
+          setErrorMessage('Authentication required. Please connect your Pi wallet.');
+          setSubmitStatus('error');
+          setIsSubmitting(false);
+          return;
+        }
+      }
+      if (!user?._id) {
+        await syncUser();
+      }
+
+      // Prepare listing data
       const listingData = {
         projectName: formData.projectName,
         email: formData.email,
@@ -100,18 +114,15 @@ const UpdateListingPage: React.FC = () => {
         changeReason: formData.changeReason
       };
 
-      // Prepare payment data
-      const paymentData: PiListingPaymentData = {
-        listingType: 'update',
+      // Process Pi payment
+      const paymentResult = await createListingPayment(
+        'update',
         listingData,
-        userInfo: {
+        {
           email: formData.email,
           name: formData.projectName
         }
-      };
-
-      // Process Pi payment
-      const paymentResult = await piListingPaymentService.createListingPayment(paymentData);
+      );
 
       if (paymentResult.success) {
         setPaymentStatus('success');

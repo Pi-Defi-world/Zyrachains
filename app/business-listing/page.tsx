@@ -24,7 +24,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { usePageMetadata } from "@/context/pagemetadataContext";
-import { piListingPaymentService, PiListingPaymentData } from '@/lib/pi-payment-frontend';
+import { usePiNetwork } from '@/context/PiNetworkContext';
 
 interface BusinessFormData {
   name: string;
@@ -40,6 +40,7 @@ interface BusinessFormData {
 
 const BusinessListingPage: React.FC = () => {
   const { setHeading, setTitle, setDescription } = usePageMetadata();
+  const { isAuthenticated, user, authenticate, syncUser, createListingPayment } = usePiNetwork();
   const [formData, setFormData] = useState<BusinessFormData>({
     name: '',
     category: '',
@@ -80,7 +81,18 @@ const BusinessListingPage: React.FC = () => {
     setSubmitStatus('payment');
     setPaymentStatus('processing');
     
-    try { 
+    try {
+      if (!isAuthenticated) {
+        await authenticate();
+        if (!isAuthenticated) {
+          setErrorMessage('Authentication required. Please connect your Pi wallet.');
+          setSubmitStatus('error');
+          setIsSubmitting(false);
+          return;
+        }
+      }
+      if (!user?._id) { await syncUser(); }
+ 
       const listingData = {
         name: formData.name,
           category: formData.category,
@@ -92,17 +104,12 @@ const BusinessListingPage: React.FC = () => {
           piWalletAddress: formData.piWalletAddress || undefined,
         acceptsPiPayments: formData.acceptsPiPayments
       };
- 
-      const paymentData: PiListingPaymentData = {
-        listingType: 'business',
+  
+      const paymentResult = await createListingPayment(
+        'business',
         listingData,
-        userInfo: {
-          email: formData.email,
-          name: formData.name
-        }
-      };
- 
-      const paymentResult = await piListingPaymentService.createListingPayment(paymentData);
+        { email: formData.email, name: formData.name }
+      );
 
       if (paymentResult.success) {
         setPaymentStatus('success');

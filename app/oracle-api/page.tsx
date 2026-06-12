@@ -79,20 +79,27 @@ export default function OracleApiPage() {
   };
 
   const handlePurchase = async () => {
-    if (!isAuthenticated || !user?._id) {
+    if (!isAuthenticated) {
       await authenticate();
       return;
+    }
+    let currentUser = user;
+    if (!currentUser?._id) {
+      setSyncing(true);
+      currentUser = await syncUser();
+      setSyncing(false);
+      if (!currentUser?._id) return;
     }
     setNewKey(null);
     const result = await createListingPayment(
       'oracle_api',
       {
-        userId: String(user._id),
+        userId: String(currentUser._id),
         name: keyName || 'Oracle API Key',
       },
       {
-        email: `${user.username || 'pi'}@minepi.com`,
-        name: user.username || 'Pi user',
+        email: `${currentUser.username || 'pi'}@minepi.com`,
+        name: currentUser.username || 'Pi user',
       }
     );
     if (result.apiKey) {

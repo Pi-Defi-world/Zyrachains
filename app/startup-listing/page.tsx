@@ -17,7 +17,7 @@ import {
   Target
 } from 'lucide-react';
 import { usePageMetadata } from "@/context/pagemetadataContext";
-import { piListingPaymentService, PiListingPaymentData } from '@/lib/pi-payment-frontend';
+import { usePiNetwork } from '@/context/PiNetworkContext';
 
 interface StartupFormData {
   name: string;
@@ -31,6 +31,7 @@ interface StartupFormData {
 
 const StartupListingPage: React.FC = () => {
   const { setHeading, setTitle, setDescription } = usePageMetadata();
+  const { isAuthenticated, user, authenticate, syncUser, createListingPayment } = usePiNetwork();
   const [formData, setFormData] = useState<StartupFormData>({
     name: '',
     category: '',
@@ -71,7 +72,17 @@ const StartupListingPage: React.FC = () => {
     setPaymentStatus('processing');
     
     try {
-      // Prepare listing data - simplified structure
+      if (!isAuthenticated) {
+        await authenticate();
+        if (!isAuthenticated) {
+          setErrorMessage('Authentication required. Please connect your Pi wallet.');
+          setSubmitStatus('error');
+          setIsSubmitting(false);
+          return;
+        }
+      }
+      if (!user?._id) { await syncUser(); }
+
       const listingData = {
         name: formData.name,
           category: formData.category,
@@ -82,18 +93,12 @@ const StartupListingPage: React.FC = () => {
         piWalletAddress: formData.piWalletAddress || undefined
       };
 
-      // Prepare payment data
-      const paymentData: PiListingPaymentData = {
-        listingType: 'startup',
-        listingData,
-        userInfo: {
-          email: formData.email,
-          name: formData.name
-        }
-      };
-
       // Process Pi payment
-      const paymentResult = await piListingPaymentService.createListingPayment(paymentData);
+      const paymentResult = await createListingPayment(
+        'startup',
+        listingData,
+        { email: formData.email, name: formData.name }
+      );
 
       if (paymentResult.success) {
         setPaymentStatus('success');

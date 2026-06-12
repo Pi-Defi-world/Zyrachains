@@ -38,7 +38,7 @@ interface PiNetworkContextType {
   
   // Authentication methods
   authenticate: () => Promise<PiAuthResult>;
-  syncUser: () => Promise<void>;
+  syncUser: () => Promise<PiUser | null>;
   refreshUser: () => Promise<void>;
   ensurePiAuthentication: () => Promise<PiAuthResult>;
   logout: () => void;
@@ -220,9 +220,9 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
     }
   };
 
-  const syncUser = async (): Promise<void> => {
+  const syncUser = async (): Promise<PiUser | null> => {
     const token = localStorage.getItem('pi_access_token');
-    if (!token) return;
+    if (!token) return null;
     try {
       const response = await fetch(`${SERVER_BASE_URL}/api/pi/auth/verify`, {
         method: 'POST',
@@ -234,11 +234,13 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
         if (data.user?._id) {
           setUser(data.user);
           localStorage.setItem('pi_user', JSON.stringify(data.user));
+          return data.user;
         }
       }
     } catch (error) {
       console.error('User sync failed:', error);
     }
+    return null;
   };
 
   const refreshUser = async (): Promise<void> => {

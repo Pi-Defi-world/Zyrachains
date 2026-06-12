@@ -48,7 +48,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           (function() {
             var s = document.createElement('script');
             s.src = 'https://sdk.minepi.com/pi-sdk.js';
-            s.onload = function() { window.Pi && window.Pi.init({ version: '2.0' }); };
+            s.onload = function() {
+              window.Pi && window.Pi.init({ version: '2.0' });
+            };
             document.head.appendChild(s);
           })();
         `}
