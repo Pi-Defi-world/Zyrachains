@@ -6,7 +6,7 @@ declare global {
   }
   
   export interface PiSDK {
-    init(config: { version: string }): void;
+    init(config: { version: string; sandbox?: boolean }): void;
     authenticate(
       scopes: string[],
       onIncompletePaymentFound?: (payment: PiPayment) => void
