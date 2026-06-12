@@ -76,8 +76,9 @@ interface PiNetworkProviderProps {
   children: ReactNode;
 }
 
-// Express server base URL
-const SERVER_BASE_URL = getPublicBackendUrl();
+function getBaseUrl(): string {
+  return getPublicBackendUrl();
+}
 
 export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -114,7 +115,7 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
 
           // Re-verify with backend
           try {
-            const resp = await fetch(`${SERVER_BASE_URL}/api/pi/auth/verify`, {
+            const resp = await fetch(`${getBaseUrl()}/api/pi/auth/verify`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ accessToken: savedToken }),
@@ -162,7 +163,7 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
         console.log('⚠️ Incomplete payment found:', payment);
         const paymentId = payment.identifier;
         try {
-          await fetch(`${SERVER_BASE_URL}/api/pi/payments/cancel`, {
+          await fetch(`${getBaseUrl()}/api/pi/payments/cancel`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ paymentId })
@@ -193,7 +194,7 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
 
       // Verify token with backend
       try {
-        const response = await fetch(`${SERVER_BASE_URL}/api/pi/auth/verify`, {
+        const response = await fetch(`${getBaseUrl()}/api/pi/auth/verify`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ accessToken: auth.accessToken }),
@@ -224,7 +225,7 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
     const token = localStorage.getItem('pi_access_token');
     if (!token) return null;
     try {
-      const response = await fetch(`${SERVER_BASE_URL}/api/pi/auth/verify`, {
+      const response = await fetch(`${getBaseUrl()}/api/pi/auth/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ accessToken: token }),
@@ -247,7 +248,7 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
     const token = localStorage.getItem('pi_access_token');
     if (!token) return;
     try {
-      const resp = await fetch(`${SERVER_BASE_URL}/api/pi/auth/verify`, {
+      const resp = await fetch(`${getBaseUrl()}/api/pi/auth/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ accessToken: token }),
@@ -275,7 +276,7 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
       ["username", "payments", "wallet_address"],
       async (payment: any) => {
         const paymentId = payment.identifier;
-        await fetch(`${SERVER_BASE_URL}/api/pi/payments/cancel`, {
+        await fetch(`${getBaseUrl()}/api/pi/payments/cancel`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ paymentId })
@@ -371,7 +372,7 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
             console.log('Payment ready for approval:', paymentId);
             setCurrentPaymentId(paymentId);
             try {
-              const response = await fetch(`${SERVER_BASE_URL}/api/pi/payments/approve`, {
+              const response = await fetch(`${getBaseUrl()}/api/pi/payments/approve`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ paymentId })
@@ -385,7 +386,7 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
           onReadyForServerCompletion: async (paymentId: string, txid: string) => {
             console.log('Payment ready for completion:', paymentId, txid);
             try {
-              const response = await fetch(`${SERVER_BASE_URL}/api/pi/payments/complete`, {
+              const response = await fetch(`${getBaseUrl()}/api/pi/payments/complete`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 

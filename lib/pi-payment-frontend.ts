@@ -24,8 +24,9 @@ export interface PiPaymentResult {
   keyPrefix?: string;
 }
 
-// Express server base URL - aligned with backend structure
-const SERVER_BASE_URL = getPublicBackendUrl();
+function getBaseUrl(): string {
+  return getPublicBackendUrl();
+}
 
 export class PiListingPaymentService {
   private static instance: PiListingPaymentService;
@@ -128,7 +129,7 @@ export class PiListingPaymentService {
           onReadyForServerApproval: async (paymentId: string) => {
             console.log('Payment ready for server approval:', paymentId);
             try {
-              const response = await fetch(`${SERVER_BASE_URL}/api/pi/payments/approve`, {
+              const response = await fetch(`${getBaseUrl()}/api/pi/payments/approve`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ paymentId })
@@ -147,7 +148,7 @@ export class PiListingPaymentService {
             console.log('Payment ready for completion:', paymentId, txid);
             try {
               // Call Express server to complete payment and save listing
-              const response = await fetch(`${SERVER_BASE_URL}/api/pi/payments/complete`, {
+              const response = await fetch(`${getBaseUrl()}/api/pi/payments/complete`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
@@ -264,7 +265,7 @@ export class PiListingPaymentService {
   private onIncompletePaymentFound = (payment: PiPayment) => {
     console.log('Incomplete payment found:', payment);
     // Cancel incomplete payment
-    fetch(`${SERVER_BASE_URL}/api/pi/payments/cancel`, {
+    fetch(`${getBaseUrl()}/api/pi/payments/cancel`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ paymentId: payment.identifier })
