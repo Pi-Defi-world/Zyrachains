@@ -82,6 +82,11 @@ export const LISTING_PAYMENTS = {
     amount: 100,
     memo: "Oracle API key purchase for Zyrachain",
     type: "oracle_api" as const
+  },
+  topup_credits: {
+    amount: 10,
+    memo: "API credit top-up for Zyrachain Oracle",
+    type: "topup_credits" as const
   }
 } as const;
 

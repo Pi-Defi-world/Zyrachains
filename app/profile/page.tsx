@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { useLanguage } from '@/context/languagecontext';
 import { usePageMetadata } from '@/context/pagemetadataContext';
 import { usePiNetwork } from '@/context/PiNetworkContext';
-import { ModeToggle } from '@/components/ui/mode-toggle';
-import { 
+import DonationModal from '@/components/DonationModal';
+import {
   Plug,
   Settings,
   FileText,
@@ -28,7 +28,8 @@ import {
   Coins,
   Droplets,
   TrendingUp,
-  Compass
+  Compass,
+  Heart
 } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
@@ -38,6 +39,7 @@ const ProfilePage: React.FC = () => {
   const [showComingSoonModal, setShowComingSoonModal] = useState(false);
   const [showListingsDropdown, setShowListingsDropdown] = useState(false);
   const [showExplorerDropdown, setShowExplorerDropdown] = useState(false);
+  const [showDonationModal, setShowDonationModal] = useState(false);
 
   React.useEffect(() => {
     setHeading('Profile');
@@ -187,9 +189,8 @@ const ProfilePage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background p-3 pb-20 sm:p-4 mobile-nav-safe">
       <div className="max-w-md mx-auto">
-        <div className="mb-4 sm:mb-6 flex items-center justify-between">
+        <div className="mb-4 sm:mb-6">
           <h1 className="text-xl sm:text-2xl font-bold text-foreground">Profile</h1>
-          <ModeToggle />
         </div>
 
         {/* Profile Card */}
@@ -317,6 +318,19 @@ const ProfilePage: React.FC = () => {
             )}
           </div>
 
+          {/* Donate Button */}
+          <button
+            onClick={() => setShowDonationModal(true)}
+            className="w-full flex items-center space-x-3 sm:space-x-4 p-4 sm:p-6 bg-card rounded-xl sm:rounded-2xl hover:bg-muted/50 transition-colors border border-border/30 shadow-sm"
+          >
+            <Heart className="h-5 w-5 sm:h-6 sm:w-6 text-red-500 flex-shrink-0" />
+            <div className="text-left min-w-0 flex-1">
+              <div className="font-semibold text-sm sm:text-base text-foreground">Donate</div>
+              <div className="text-xs sm:text-sm text-muted-foreground mt-0.5 sm:mt-1">Support Zyrachain with a Pi donation</div>
+            </div>
+            <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground flex-shrink-0 ml-2" />
+          </button>
+
           {/* Other Menu Items */}
           {profileMenuItems.map((item, index) => (
             item.onClick ? (
@@ -397,6 +411,12 @@ const ProfilePage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Donation Modal */}
+      <DonationModal
+        isOpen={showDonationModal}
+        onClose={() => setShowDonationModal(false)}
+      />
     </div>
   );
 };

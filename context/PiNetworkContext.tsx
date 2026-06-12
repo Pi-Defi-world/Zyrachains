@@ -38,6 +38,7 @@ interface PiNetworkContextType {
   
   // Authentication methods
   authenticate: () => Promise<PiAuthResult>;
+  syncUser: () => Promise<void>;
   logout: () => void;
   
   // Payment methods
@@ -182,6 +183,29 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
       throw error;
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const syncUser = async (): Promise<void> => {
+    const token = localStorage.getItem('pi_access_token');
+    if (!token) return;
+
+    try {
+      const response = await fetch(`${SERVER_BASE_URL}/api/pi/auth/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accessToken: token }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.user?._id) {
+          setUser(data.user);
+          localStorage.setItem('pi_user', JSON.stringify(data.user));
+        }
+      }
+    } catch (error) {
+      console.error('User sync failed:', error);
     }
   };
 
@@ -341,6 +365,7 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
     accessToken,
     isLoading,
     authenticate,
+    syncUser,
     logout,
     createListingPayment,
     createPayment,

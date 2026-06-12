@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import {
   Key, Activity, Clock, BarChart3, Trash2, ExternalLink,
   Loader2, Copy, Check, AlertCircle, RefreshCw, Eye, Zap,
-  Shield, TrendingUp, Timer, Hash
+  Shield, TrendingUp, Timer, Hash, Coins
 } from 'lucide-react';
 import { getPublicBackendUrl } from '@/lib/get-backend-url';
 
@@ -26,6 +26,8 @@ interface ApiKeyDoc {
   createdAt: string;
   expiresAt?: string;
   rateLimit?: { requestsPerMinute: number; requestsPerDay: number };
+  credits?: number;
+  creditCostPerRequest?: number;
 }
 
 interface KeyUsage {
@@ -43,6 +45,8 @@ interface KeyUsage {
     requestsPerMinute: number;
     requestsPerDay: number;
   };
+  credits?: number;
+  creditCostPerRequest?: number;
 }
 
 export default function ApiDashboardPage() {
@@ -213,6 +217,45 @@ export default function ApiDashboardPage() {
               </Card>
             </div>
 
+            {/* Credits Row */}
+            {selectedKey && usageData && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Coins className="h-4 w-4 text-amber-500" />
+                      <span className="text-2xl font-bold text-foreground">
+                        {(usageData.credits ?? 0).toFixed(1)}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Credits (@ {(usageData.creditCostPerRequest ?? 0.01)}/req)
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <TrendingUp className="h-4 w-4 text-blue-500" />
+                      <span className="text-2xl font-bold text-foreground">
+                        {((usageData.credits ?? 0) / (usageData.creditCostPerRequest || 0.01)).toFixed(0)}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Est. remaining requests</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 flex items-center justify-center h-full">
+                    <Link href="/api-dashboard/topup">
+                      <Button size="sm" variant="default">
+                        <Zap className="h-4 w-4 mr-1" /> Top Up Credits
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
             {/* Error Alert */}
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
@@ -342,18 +385,16 @@ export default function ApiDashboardPage() {
                           <span className="text-xs font-medium text-foreground">Total Requests</span>
                         </div>
                         <p className="text-2xl font-bold text-foreground">{usageData.usage.totalRequests.toLocaleString()}</p>
-                        <div className="mt-3">
-                          <div className="flex justify-between text-[10px] text-muted-foreground mb-1">
-                            <span>Daily usage</span>
-                            <span>{Math.min(usageData.usage.totalRequests, rpdLimit)} / {rpdLimit.toLocaleString()}</span>
-                          </div>
-                          <div className="w-full bg-muted rounded-full h-1.5">
-                            <div
-                              className="bg-green-500 h-1.5 rounded-full transition-all"
-                              style={{ width: `${Math.min(100, (usageData.usage.totalRequests / rpdLimit) * 100)}%` }}
-                            />
-                          </div>
+                      </div>
+                      <div className="bg-muted/30 rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Coins className="h-4 w-4 text-amber-500" />
+                          <span className="text-xs font-medium text-foreground">Credits</span>
                         </div>
+                        <p className="text-2xl font-bold text-foreground">{(usageData.credits ?? 0).toFixed(1)}</p>
+                        <p className="text-[10px] text-muted-foreground mt-1">
+                          ~{((usageData.credits ?? 0) / (usageData.creditCostPerRequest || 0.01)).toFixed(0)} remaining requests
+                        </p>
                       </div>
                       <div className="bg-muted/30 rounded-lg p-4">
                         <div className="flex items-center gap-2 mb-2">
@@ -419,17 +460,17 @@ export default function ApiDashboardPage() {
                   <Link href="/oracle-api" className="block p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
                     <Key className="h-5 w-5 text-primary mb-2" />
                     <p className="text-sm font-medium text-foreground">Purchase a Key</p>
-                    <p className="text-xs text-muted-foreground mt-1">100 Pi one-time payment</p>
+                    <p className="text-xs text-muted-foreground mt-1">100 Pi — incl. 100 credits</p>
+                  </Link>
+                  <Link href="/api-dashboard/topup" className="block p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+                    <Zap className="h-5 w-5 text-primary mb-2" />
+                    <p className="text-sm font-medium text-foreground">Top Up Credits</p>
+                    <p className="text-xs text-muted-foreground mt-1">Add credits to existing keys</p>
                   </Link>
                   <Link href="/api-documentation" className="block p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
-                    <ExternalLink className="h-5 w-5 text-primary mb-2" />
+                    <Shield className="h-5 w-5 text-primary mb-2" />
                     <p className="text-sm font-medium text-foreground">API Documentation</p>
                     <p className="text-xs text-muted-foreground mt-1">Full endpoint reference & examples</p>
-                  </Link>
-                  <Link href="/docs" className="block p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
-                    <Shield className="h-5 w-5 text-primary mb-2" />
-                    <p className="text-sm font-medium text-foreground">General Docs</p>
-                    <p className="text-xs text-muted-foreground mt-1">Platform guides & ecosystem</p>
                   </Link>
                 </div>
               </CardContent>

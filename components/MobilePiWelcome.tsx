@@ -37,9 +37,6 @@ export function MobilePiWelcome({ onAuthSuccess, onClose }: MobilePiWelcomeProps
         } else if (savedToken && savedUser) {
           shouldShow = true;
           reason = 'Your session has expired. Please reconnect your Pi wallet.';
-        } else {
-          shouldShow = true;
-          reason = 'Please reconnect your Pi wallet to continue.';
         }
         
         if (shouldShow) {
@@ -116,6 +113,7 @@ export function MobilePiWelcome({ onAuthSuccess, onClose }: MobilePiWelcomeProps
 
   const handleClose = () => {
     console.log('Closing MobilePiWelcome modal');
+    localStorage.setItem('pi_has_authenticated', 'true');
     setIsVisible(false);
     setAuthSuccess(false);
     setError(null);
@@ -125,6 +123,7 @@ export function MobilePiWelcome({ onAuthSuccess, onClose }: MobilePiWelcomeProps
 
   const handleSkip = () => {
     console.log('Skipping Pi authentication');
+    localStorage.setItem('pi_has_authenticated', 'true');
     setIsVisible(false);
     setAuthSuccess(false);
     setError(null);

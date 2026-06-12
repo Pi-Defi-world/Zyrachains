@@ -17,7 +17,7 @@ const BASE = getPublicBackendUrl();
 
 export default function OracleApiPage() {
   const { setTitle, setDescription, setHeading } = usePageMetadata();
-  const { isAuthenticated, user, authenticate, createListingPayment, isPaymentInProgress } =
+  const { isAuthenticated, user, authenticate, syncUser, createListingPayment, isPaymentInProgress } =
     usePiNetwork();
   const [keyName, setKeyName] = useState('My Oracle key');
   const [newKey, setNewKey] = useState<string | null>(null);
@@ -33,6 +33,7 @@ export default function OracleApiPage() {
     }>
   >([]);
   const [loadingKeys, setLoadingKeys] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     setHeading('Pi Price Oracle API');
@@ -60,6 +61,22 @@ export default function OracleApiPage() {
   useEffect(() => {
     if (isAuthenticated) loadKeys();
   }, [isAuthenticated]);
+
+  // Auto-retry backend sync when authenticated but _id is missing
+  useEffect(() => {
+    if (!isAuthenticated || user?._id) return;
+    const timer = setTimeout(() => {
+      setSyncing(true);
+      syncUser().finally(() => setSyncing(false));
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [isAuthenticated, user?._id, syncUser]);
+
+  const handleRetrySync = async () => {
+    setSyncing(true);
+    await syncUser();
+    setSyncing(false);
+  };
 
   const handlePurchase = async () => {
     if (!isAuthenticated || !user?._id) {
@@ -104,7 +121,7 @@ export default function OracleApiPage() {
           </Badge>
           <h1 className="text-3xl font-bold font-heading text-foreground">Pi Price Oracle API</h1>
           <p className="text-muted-foreground mt-2">
-            Pay <strong>{cfg.amount} Pi</strong> once to receive an API key. Use it to access
+            Pay <strong>{cfg.amount} Pi</strong> to receive an API key. Use it to access
             aggregated PI/USD price data, health checks, and optional Horizon proxy endpoints.
           </p>
           <p className="text-sm text-muted-foreground mt-2">
@@ -151,9 +168,17 @@ export default function OracleApiPage() {
                   )}
                 </Button>
                 {!user?._id && isAuthenticated && (
-                  <p className="text-sm text-amber-600">
-                    Syncing your account… If this persists, open Profile after connecting Pi.
-                  </p>
+                  <div className="flex items-center gap-3 text-sm text-amber-600 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
+                    <Loader2 className={`h-4 w-4 flex-shrink-0 ${syncing ? 'animate-spin' : ''}`} />
+                    <span className="flex-1">
+                      {syncing ? 'Syncing your account…' : 'Account sync pending.'}
+                    </span>
+                    {!syncing && (
+                      <Button variant="outline" size="sm" onClick={handleRetrySync}>
+                        Retry
+                      </Button>
+                    )}
+                  </div>
                 )}
               </>
             )}

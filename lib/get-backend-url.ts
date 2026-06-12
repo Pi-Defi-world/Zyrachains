@@ -1,5 +1,5 @@
 const DEFAULT_LOCAL_URL = 'http://localhost:4000';
-const DEFAULT_REMOTE_URL = 'https://zyrachain-server.onrender.com';
+const DEFAULT_REMOTE_URL = 'https://api.zyrachain.org';
 
 const normalize = (url: string): string => {
   const trimmed = url.trim();

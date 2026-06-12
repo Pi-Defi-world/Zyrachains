@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -8,7 +8,7 @@ import {
   Coins, Droplets, ArrowRightLeft, TrendingUp, Wallet,
   Globe, Calendar, Sparkles, Star, AlertTriangle,
   ShieldCheck, Zap, MessageSquare, User, ChevronLeft,
-  ChevronRight, Menu,
+  ChevronRight, Menu, X, GripHorizontal,
 } from 'lucide-react';
 
 interface NavGroup {
@@ -80,8 +80,103 @@ export function Sidebar() {
   const pathname = usePathname();
   const [expanded, setExpanded] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [position, setPosition] = useState(() => ({ x: 16, y: typeof window !== 'undefined' ? window.innerHeight - 80 : 600 }));
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const dragRef = useRef<HTMLButtonElement>(null);
 
   const close = useCallback(() => setMobileOpen(false), []);
+
+  // Load saved position on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('sidebar-toggle-position');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (typeof parsed.x === 'number' && typeof parsed.y === 'number') {
+          setPosition(parsed);
+        }
+      } catch { /* use default */ }
+    }
+  }, []);
+
+  // Save position when dragging ends
+  const savePosition = (pos: { x: number; y: number }) => {
+    setPosition(pos);
+    localStorage.setItem('sidebar-toggle-position', JSON.stringify(pos));
+  };
+
+  const constrainPosition = (pos: { x: number; y: number }) => {
+    const size = 48;
+    const margin = 8;
+    return {
+      x: Math.max(margin, Math.min(pos.x, window.innerWidth - size - margin)),
+      y: Math.max(margin, Math.min(pos.y, window.innerHeight - size - margin)),
+    };
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (mobileOpen) return;
+    setIsDragging(true);
+    const rect = dragRef.current?.getBoundingClientRect();
+    if (rect) {
+      setDragOffset({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    }
+    e.preventDefault();
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (mobileOpen) return;
+    setIsDragging(true);
+    const rect = dragRef.current?.getBoundingClientRect();
+    const touch = e.touches[0];
+    if (rect && touch) {
+      setDragOffset({ x: touch.clientX - rect.left, y: touch.clientY - rect.top });
+    }
+    e.preventDefault();
+  };
+
+  const handleToggle = () => {
+    if (!isDragging) {
+      setMobileOpen((v) => !v);
+    }
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
+      setPosition(constrainPosition({ x: e.clientX - dragOffset.x, y: e.clientY - dragOffset.y }));
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isDragging) return;
+      const touch = e.touches[0];
+      if (touch) {
+        setPosition(constrainPosition({ x: touch.clientX - dragOffset.x, y: touch.clientY - dragOffset.y }));
+      }
+    };
+
+    const handleDragEnd = () => {
+      if (isDragging) {
+        setIsDragging(false);
+        savePosition(position);
+      }
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('mouseup', handleDragEnd);
+      document.addEventListener('touchend', handleDragEnd);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('mouseup', handleDragEnd);
+      document.removeEventListener('touchend', handleDragEnd);
+    };
+  }, [isDragging, dragOffset, position]);
 
   // Close on route change
   useEffect(() => { close(); }, [pathname, close]);
@@ -150,12 +245,23 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Mobile toggle */}
+      {/* Mobile toggle - draggable */}
       <button
-        onClick={() => setMobileOpen((v) => !v)}
-        className="fixed bottom-4 left-4 z-[100] lg:hidden p-2.5 rounded-full bg-accent text-accent-foreground shadow-lg"
+        ref={dragRef}
+        onClick={handleToggle}
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
+        className={`fixed z-[100] lg:hidden p-2.5 rounded-full bg-accent text-accent-foreground shadow-lg transition-transform duration-200 group border-2 border-accent-foreground/10 ${
+          mobileOpen ? 'scale-110' : isDragging ? 'cursor-grabbing scale-110' : 'cursor-grab hover:scale-105'
+        }`}
+        style={{ left: position.x, top: position.y }}
       >
-        <Menu className="h-5 w-5" />
+        {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        {!mobileOpen && (
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-muted/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <GripHorizontal className="h-3 w-3 text-muted-foreground" />
+          </div>
+        )}
       </button>
 
       {/* Desktop: fixed inline */}
