@@ -25,6 +25,13 @@ const shouldPreferLocal = (): boolean => {
   if (process.env.NEXT_PUBLIC_FORCE_LOCAL_BACKEND === 'true' || process.env.FORCE_LOCAL_BACKEND === 'true') {
     return true;
   }
+  // In browser, check hostname — only localhost uses local backend
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') return true;
+    return false; // any real domain → remote backend
+  }
+  // Server-side: rely on NODE_ENV
   return process.env.NODE_ENV !== 'production';
 };
 
