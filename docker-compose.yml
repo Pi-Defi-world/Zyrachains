@@ -1,0 +1,10 @@
+# docker-compose.yml — defines the containers Pi Desktop runs for your app.
+# Reference published remote images with "image:". Local "build:" is NOT supported.
+services:
+  web:
+    image: ghcr.io/zyrachains/frontend:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"
+    env_file:
+      - .env
