@@ -1,7 +1,5 @@
-# config_options.yml — describes the install form Pi Desktop renders.
-# Each field becomes one input; its "name" is the .env key written on install.
 title: Zyrachains Frontend
-description: Next.js frontend for the Zyrachains Pi Network ecosystem hub.
+description: Next.js frontend
 output_file: .env
 
 fixed_values:
@@ -19,26 +17,34 @@ fields:
       - value: development
         label: Development
 
+  - name: FORCE_LOCAL_BACKEND
+    label: Backend mode
+    type: select
+    default: local
+    options:
+      - value: local
+        label: Local
+        set:
+          FORCE_LOCAL_BACKEND: "true"
+          NEXT_PUBLIC_FORCE_LOCAL_BACKEND: "true"
+      - value: remote
+        label: Remote
+        set:
+          FORCE_LOCAL_BACKEND: "false"
+          NEXT_PUBLIC_FORCE_LOCAL_BACKEND: "false"
+
   - name: NEXT_PUBLIC_API_URL
     label: Backend API URL
     type: text
-    default: http://localhost:4000
+    default: "http://localhost:4000"
     required: true
-    help: URL of the Zyrachain backend server (must be reachable from the browser)
 
   - name: LOCAL_SERVER_URL
-    label: Local server URL
+    label: Internal backend URL (container-to-host)
     type: text
-    default: http://localhost:4000
-    help: Internal URL for server-side API calls
-
-  - name: NEXT_PUBLIC_LOCAL_SERVER_URL
-    label: Public local server URL
-    type: text
-    default: http://localhost:4000
+    default: "http://host.docker.internal:4000"
 
   - name: NEXT_PUBLIC_HORIZON_URL
     label: Horizon proxy URL
     type: text
-    default: http://localhost:8000
-    help: URL for Horizon API proxy rewrites (defaults to frontend itself)
+    default: "http://localhost:8000"
