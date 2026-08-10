@@ -7,7 +7,7 @@ import { language_vi } from './vn';
 import { language_zh } from './zh';
 
 // Define available languages
-export type Language = 'en' | 'vi' | 'ko' | 'zh';
+export type Language = 'en' | 'vi' | 'ko' | 'zh' | 'tr';
 // Language names for display
 export const languageNames = {
   en: 'English',

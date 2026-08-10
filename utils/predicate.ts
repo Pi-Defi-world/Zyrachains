@@ -76,6 +76,22 @@ const translations = {
     days: "天",
     hours: "小时",
     seconds: "秒",
+  },
+  tr: {
+    no_restrictions: "Talep kısıtlaması yok",
+    lock_for: "Kilit süresi",
+    unlocks: "Kilidi açar",
+    not: "Değil",
+    must_claim_in: "Şu süre içinde talep edilmeli",
+    claim_after: "Şu tarihten sonra talep et",
+    claim_before: "Şu tarihten önce talep et",
+    all: "Tümü",
+    any: "Herhangi biri",
+    and: "VE",
+    or: "VEYA",
+    days: "gün",
+    hours: "saat",
+    seconds: "saniye",
   }
 };
 
