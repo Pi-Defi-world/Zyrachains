@@ -703,7 +703,7 @@ export  const language_tr={
     ],
     'report.info.note': 'Not: Tüm bildirimleri ciddiye alıyor ve her vakayı kapsamlı bir şekilde araştıracağız. Gizliliğiniz süreç boyunca korunacaktır.',
     'assets.search_placeholder': 'Kod veya ihraççıya göre ara...',
-    'assets.testnet_warning': 'Pi Network Mainnet verileri. Mainnet'te henüz özel varlık bulunmamaktadır.',
+    'assets.testnet_warning': 'Pi Network Mainnet verileri. Mainnet\'te henüz özel varlık bulunmamaktadır.',
     'monitor.balance_trend': 'Bakiye Eğilimi',
     'monitor.scanned': 'tarandı',
     'home.monitors.wallets_tracked': 'İzlenen Cüzdanlar',
