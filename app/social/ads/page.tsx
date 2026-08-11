@@ -43,7 +43,7 @@ export default function AdsPage() {
     try {
       const result = await socialAPI.watchAd(watchingAd._id);
       await refreshBalance();
-      setMessage(t('social.ads_earned_toast', { amount: result.data.reward }));
+      setMessage(String(t('social.ads_earned_toast', { amount: result.data.reward })));
       const refreshed = await socialAPI.getAds();
       setAdsData(refreshed.data);
       setTimeout(() => setMessage(''), 3000);
