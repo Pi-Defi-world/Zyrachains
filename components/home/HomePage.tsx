@@ -12,6 +12,7 @@ import { LiveActivityFeed } from '@/components/home/LiveActivityFeed';
 import { HomeMonitorsDashboard } from '@/components/home/HomeMonitorsDashboard';
 import { HomePoolsTable } from '@/components/home/HomePoolsTable';
 import { HomeAssetStats } from '@/components/home/HomeAssetStats';
+import { HomeSocialSection } from '@/components/home/HomeSocialSection';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowUpRight, ArrowDownRight, Building2, Users, ExternalLink, Activity } from 'lucide-react';
 import type { SnapshotResponse } from '@/lib/server-fetch';
@@ -29,6 +30,7 @@ const tabs: { id: TabType; label: string }[] = [
   { id: 'network', label: 'Network' },
   { id: 'monitors', label: 'Monitors' },
   { id: 'ecosystem', label: 'Ecosystem' },
+  { id: 'social', label: 'Social' },
 ];
 
 type HeroData = {
@@ -336,6 +338,13 @@ export function HomePage({
                 <h2 className="text-xl sm:text-2xl font-bold text-foreground">Community & Ecosystem</h2>
                 {ecoData ? <EcosystemSectionContent data={ecoData} /> : ecosystemFallback}
               </section>
+            </div>
+          )}
+
+          {/* Social Tab */}
+          {activeTab === 'social' && (
+            <div className="space-y-6 sm:space-y-8 animate-in fade-in-0">
+              <HomeSocialSection />
             </div>
           )}
 

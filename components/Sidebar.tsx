@@ -68,6 +68,15 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
+    label: 'Social', icon: <MessageSquare className="h-4 w-4" />,
+    links: [
+      { href: '/social', label: 'Feed' },
+      { href: '/social/leaderboard', label: 'Leaderboard' },
+      { href: '/social/ads', label: 'Earn ZP' },
+      { href: '/social/badges', label: 'Badges' },
+    ],
+  },
+  {
     label: 'Account', icon: <User className="h-4 w-4" />,
     links: [
       { href: '/profile', label: 'Profile' },

@@ -4,6 +4,7 @@ import GlobalFooter from "@/components/GlobalFooter";
 import { PageMetadataProvider } from "@/context/pagemetadataContext";
 import { LanguageProvider } from '@/context/languagecontext';
 import { PiNetworkProvider } from '@/context/PiNetworkContext';
+import { SocialProvider } from '@/context/SocialContext';
 import GlobalMobileElements from "@/components/GlobalMobileElements";
 import { ThemeProvider } from "@/components/theme-provider";
 import NavbarWithMobile from '@/components/navbar';
@@ -58,6 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <BackgroundAnimation />
         <ThemeProvider defaultTheme="system">
           <PiNetworkProvider>
+            <SocialProvider>
             <AddressProvider>
               <LanguageProvider>
                 <PageMetadataProvider>
@@ -79,6 +81,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </PageMetadataProvider>
               </LanguageProvider>
             </AddressProvider>
+            </SocialProvider>
           </PiNetworkProvider>
         </ThemeProvider>
       </body>
