@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import BalanceHistoryChart from '@/components/charts/BalanceHistoryChart';
 import { useAggregateBalanceHistory } from '@/lib/use-chart-data';
+import { useLanguage } from '@/context/languagecontext';
 import { fmtPi, fmtPiCompact, fmtInt, shortHash, timeAgo } from '@/lib/format';
 
 type MonitorType = 'pct' | 'cex';
@@ -86,6 +87,11 @@ function Skeleton() {
 }
 
 export function HomeMonitorsDashboard({ type }: { type: MonitorType }) {
+  const { t } = useLanguage();
+  const tStr = useCallback((key: string, vars?: Record<string, any>) => {
+    const v = typeof vars === 'undefined' ? t(key) : t(key, vars);
+    return Array.isArray(v) ? String(v[0]) : v;
+  }, [t]);
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [changes, setChanges] = useState<ChangeRow[]>([]);
   const [flows, setFlows] = useState<CexFlow[] | null>(null);
@@ -148,12 +154,13 @@ export function HomeMonitorsDashboard({ type }: { type: MonitorType }) {
   }, [type]);
 
   const detailHref = type === 'pct' ? '/pct-wallet-monitor' : '/cex-wallet-monitor';
-  const title = type === 'pct' ? 'Core Team Wallets' : 'Exchange (CEX) Wallets';
+  const title = type === 'pct' ? tStr('home.monitors.core_team_wallets') : tStr('home.monitors.exchange_wallets');
+  const trackerType = type === 'pct' ? 'Core Team' : 'Exchange';
 
   if (error && !summary) {
     return (
       <div className="rounded-xl border border-dashed border-border p-6 text-sm text-muted-foreground text-center">
-        {title} data temporarily unavailable. Ensure the monitor service is running.
+        {tStr('home.monitors.data_unavailable', { title })}
       </div>
     );
   }
@@ -166,17 +173,17 @@ export function HomeMonitorsDashboard({ type }: { type: MonitorType }) {
     <div className="space-y-5">
       {/* Stat cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
-        <StatCard label="Wallets Tracked" value={fmtInt(summary.walletsTracked)} icon={Wallet} />
-        <StatCard label="Current Balance" value={fmtPiCompact(summary.currentBalance ?? undefined)} icon={Activity} />
+        <StatCard label={tStr('home.monitors.wallets_tracked')} value={fmtInt(summary.walletsTracked)} icon={Wallet} />
+        <StatCard label={tStr('home.monitors.current_balance')} value={fmtPiCompact(summary.currentBalance ?? undefined)} icon={Activity} />
         <StatCard
-          label="Net 24h"
+          label={tStr('home.monitors.net_24h')}
           value={fmtPiCompact(summary.netChange24h)}
           icon={summary.netChange24h >= 0 ? TrendingUp : TrendingDown}
           tone={summary.netChange24h >= 0 ? 'gain' : 'loss'}
         />
-        <StatCard label="Total Out" value={fmtPiCompact(summary.totalOut)} icon={ArrowUpFromLine} tone="loss" />
-        <StatCard label="Confirmed Changes" value={fmtInt(summary.confirmedChanges)} icon={ArrowDownToLine} />
-        <StatCard label="Starting Balance" value={fmtPiCompact(summary.startingBalance ?? undefined)} icon={Wallet} />
+        <StatCard label={tStr('home.monitors.total_out')} value={fmtPiCompact(summary.totalOut)} icon={ArrowUpFromLine} tone="loss" />
+        <StatCard label={tStr('home.monitors.confirmed_changes')} value={fmtInt(summary.confirmedChanges)} icon={ArrowDownToLine} />
+        <StatCard label={tStr('home.monitors.starting_balance')} value={fmtPiCompact(summary.startingBalance ?? undefined)} icon={Wallet} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
@@ -184,7 +191,7 @@ export function HomeMonitorsDashboard({ type }: { type: MonitorType }) {
         <Card className="card-elevated lg:col-span-2">
           <CardContent className="p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-foreground">Aggregate Balance Trend</h3>
+              <h3 className="text-sm font-semibold text-foreground">{tStr('home.monitors.aggregate_balance_trend')}</h3>
               <div className="flex gap-1 rounded-lg border border-border p-0.5">
                 {(['1d', '7d', '30d'] as const).map((r) => (
                   <button
@@ -206,9 +213,9 @@ export function HomeMonitorsDashboard({ type }: { type: MonitorType }) {
         {/* Recent changes */}
         <Card className="card-elevated">
           <CardContent className="p-4">
-            <h3 className="text-sm font-semibold text-foreground mb-3">Recent Balance Changes</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-3">{tStr('home.monitors.recent_balance_changes')}</h3>
             {changes.length === 0 ? (
-              <p className="text-xs text-muted-foreground">No changes recorded recently.</p>
+              <p className="text-xs text-muted-foreground">{tStr('home.monitors.no_changes_recorded')}</p>
             ) : (
               <div className="space-y-1 max-h-[220px] overflow-y-auto">
                 {changes.map((c, idx) => (
@@ -236,7 +243,7 @@ export function HomeMonitorsDashboard({ type }: { type: MonitorType }) {
       {type === 'cex' && flows && flows.length > 0 && (
         <Card className="card-elevated">
           <CardContent className="p-4">
-            <h3 className="text-sm font-semibold text-foreground mb-3">Per-Exchange 24h Flow</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-3">{tStr('home.monitors.per_exchange_flow')}</h3>
             <div className="space-y-2.5">
               {flows.slice(0, 8).map((f) => (
                 <div key={f.identifier} className="space-y-1">
@@ -258,8 +265,8 @@ export function HomeMonitorsDashboard({ type }: { type: MonitorType }) {
               ))}
             </div>
             <div className="flex gap-4 mt-3 text-[10px] text-muted-foreground">
-              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-success/70" /> Inflow</span>
-              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-danger/70" /> Outflow</span>
+              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-success/70" /> {tStr('home.monitors.inflow')}</span>
+              <span className="inline-flex items-center gap-1"><span className="h-2 w-2 rounded-sm bg-danger/70" /> {tStr('home.monitors.outflow')}</span>
             </div>
           </CardContent>
         </Card>
@@ -270,7 +277,7 @@ export function HomeMonitorsDashboard({ type }: { type: MonitorType }) {
           href={detailHref}
           className="inline-flex items-center gap-1 text-xs text-primary hover:underline font-medium"
         >
-          Open full {type === 'pct' ? 'Core Team' : 'Exchange'} tracker
+          {tStr('home.monitors.open_full_tracker', { type: trackerType })}
           <ExternalLink className="h-3 w-3" />
         </Link>
       </div>

@@ -61,15 +61,10 @@ export const LanguageProvider: React.FC<{children: ReactNode}> = ({ children }) 
   const [language, setLanguage] = useState<Language>('en');
   const [translations, setTranslations] = useState<Record<string, any>>({});
 
-  // Set initial language from localStorage or browser preference on client-side
+  // Set initial language from localStorage on client-side, default to English
   useEffect(() => {
-    const getBrowserLanguage = (): Language => {
-      const browserLang = navigator.language.split('-')[0];
-      return (browserLang as Language) in languageNames ? (browserLang as Language) : 'en';
-    };
-
     const savedLanguage = localStorage.getItem('language') as Language;
-    setLanguage(savedLanguage || getBrowserLanguage());
+    setLanguage(savedLanguage && (savedLanguage in languageNames) ? savedLanguage : 'en');
   }, []);
 
   // Updated translation function to handle template variables and arrays

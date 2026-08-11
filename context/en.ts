@@ -733,5 +733,25 @@ export const language_en={
     'report.info.note': 'Note: We take all reports seriously and will investigate each case thoroughly. Your privacy will be protected throughout the process.',
 
     'assets.search_placeholder': 'Search by code or issuer...',
-    'assets.testnet_warning': 'Data from Pi Network Mainnet. No custom assets exist on mainnet yet.'
+    'assets.testnet_warning': 'Data from Pi Network Mainnet. No custom assets exist on mainnet yet.',
+
+    // Monitor dashboard shared translations
+    'monitor.balance_trend': 'Balance Trend',
+    'monitor.scanned': 'scanned',
+    'home.monitors.wallets_tracked': 'Wallets Tracked',
+    'home.monitors.current_balance': 'Current Balance',
+    'home.monitors.net_24h': 'Net 24h',
+    'home.monitors.total_out': 'Total Out',
+    'home.monitors.confirmed_changes': 'Confirmed Changes',
+    'home.monitors.starting_balance': 'Starting Balance',
+    'home.monitors.aggregate_balance_trend': 'Aggregate Balance Trend',
+    'home.monitors.recent_balance_changes': 'Recent Balance Changes',
+    'home.monitors.no_changes_recorded': 'No changes recorded recently.',
+    'home.monitors.per_exchange_flow': 'Per-Exchange 24h Flow',
+    'home.monitors.inflow': 'Inflow',
+    'home.monitors.outflow': 'Outflow',
+    'home.monitors.open_full_tracker': 'Open full {{type}} tracker',
+    'home.monitors.core_team_wallets': 'Core Team Wallets',
+    'home.monitors.exchange_wallets': 'Exchange (CEX) Wallets',
+    'home.monitors.data_unavailable': '{{title}} data temporarily unavailable. Ensure the monitor service is running.',
   }

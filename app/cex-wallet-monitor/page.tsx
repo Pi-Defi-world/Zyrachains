@@ -199,7 +199,7 @@ export default function CexWalletMonitorPage() {
         {/* Balance Trend Chart — separate section */}
         <div className="rounded-xl border border-border/60 bg-card/95 overflow-hidden mb-8">
           <div className="flex items-center justify-between px-4 sm:px-6 pt-4 pb-2">
-            <h3 className="text-sm font-semibold text-foreground">Balance Trend</h3>
+            <h3 className="text-sm font-semibold text-foreground">{tStr('monitor.balance_trend')}</h3>
             <div className="flex gap-1">
               {(['1d', '7d', '30d'] as const).map((r) => (
                 <button
@@ -242,7 +242,7 @@ export default function CexWalletMonitorPage() {
               <span className="text-foreground">{fmtUtc(summary?.latestCheck ?? null)}</span>
               {summary?.scanLock ? ` · ${tStr('cex_monitor.scan_running')}` : ''}
               {summary?.scannedWallets !== undefined && summary.walletsTracked > 0
-                ? ` · ${summary.scannedWallets.toLocaleString('en-US')}/${summary.walletsTracked.toLocaleString('en-US')} scanned`
+                ? ` · ${summary.scannedWallets.toLocaleString('en-US')}/${summary.walletsTracked.toLocaleString('en-US')} ${tStr('monitor.scanned')}`
                 : ''}
             </p>
           </div>
@@ -252,11 +252,11 @@ export default function CexWalletMonitorPage() {
               <ul className="divide-y divide-border/70 max-h-[560px] overflow-y-auto">
                 {(walletData?.wallets ?? []).map((w) => (
                   <li key={w.identifier} className="hover:bg-accent/40">
-                    <Link href={`/account/${w.identifier}`} className="flex flex-col sm:flex-row sm:items-center gap-1 px-4 py-3 text-primary hover:underline">
-                      <span className="hidden sm:inline text-xs text-muted-foreground break-all">{w.identifier}</span>
-                      <span className="sm:hidden text-sm">{w.walletShort}</span>
+                    <Link href={`/account/${w.identifier}`} className="flex flex-col sm:flex-row sm:items-center gap-1 px-4 py-3 text-primary hover:underline min-w-0">
+                      <span className="hidden sm:inline text-xs text-muted-foreground break-all min-w-0">{w.identifier}</span>
+                      <span className="sm:hidden text-sm truncate">{w.walletShort}</span>
                       <span className="hidden sm:inline text-sm">{w.walletShort}</span>
-                      {w.lastBalance != null && <span className="sm:ml-auto text-[11px] text-muted-foreground whitespace-nowrap">{fmtPi(w.lastBalance)}</span>}
+                      {w.lastBalance != null && <span className="sm:ml-auto text-[11px] text-muted-foreground whitespace-nowrap shrink-0">{fmtPi(w.lastBalance)}</span>}
                     </Link>
                   </li>
                 ))}
@@ -311,9 +311,9 @@ function StatCard({
     cls = val < 0 ? 'text-destructive' : val > 0 ? 'text-primary' : 'text-muted-foreground';
   }
   return (
-    <div className="rounded-xl border border-border bg-card/95 px-3 py-4 shadow-sm">
-      <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">{label}</div>
-      <div className={`text-lg sm:text-xl font-semibold break-all ${cls}`}>{value}</div>
+    <div className="rounded-xl border border-border bg-card/95 px-3 py-4 shadow-sm min-w-0 overflow-hidden">
+      <div className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1 truncate">{label}</div>
+      <div className={`text-lg sm:text-xl font-semibold truncate ${cls}`}>{value}</div>
     </div>
   );
 }
@@ -332,12 +332,12 @@ function ChangesTable({
       <Table>
         <TableHeader>
           <TableRow className="border-border hover:bg-transparent">
-            <TableHead className="text-muted-foreground font-mono">{tr('cex_monitor.col_wallet')}</TableHead>
-            <TableHead className="text-muted-foreground font-mono">{tr('cex_monitor.col_old')}</TableHead>
-            <TableHead className="text-muted-foreground font-mono">{tr('cex_monitor.col_new')}</TableHead>
-            <TableHead className="text-muted-foreground font-mono">{tr('cex_monitor.col_change')}</TableHead>
-            <TableHead className="text-muted-foreground font-mono">{tr('cex_monitor.col_detected')}</TableHead>
-            <TableHead className="text-muted-foreground font-mono">{tr('cex_monitor.col_ledger')}</TableHead>
+            <TableHead className="text-muted-foreground font-mono whitespace-normal">{tr('cex_monitor.col_wallet')}</TableHead>
+            <TableHead className="text-muted-foreground font-mono whitespace-normal">{tr('cex_monitor.col_old')}</TableHead>
+            <TableHead className="text-muted-foreground font-mono whitespace-normal">{tr('cex_monitor.col_new')}</TableHead>
+            <TableHead className="text-muted-foreground font-mono whitespace-normal">{tr('cex_monitor.col_change')}</TableHead>
+            <TableHead className="text-muted-foreground font-mono whitespace-normal">{tr('cex_monitor.col_detected')}</TableHead>
+            <TableHead className="text-muted-foreground font-mono whitespace-normal">{tr('cex_monitor.col_ledger')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -350,7 +350,7 @@ function ChangesTable({
           ) : (
             rows.map((r) => (
               <TableRow key={r.id} className="border-border hover:bg-accent/40">
-                <TableCell className="font-mono text-[12px]">
+                <TableCell className="font-mono text-[12px] max-w-[140px] truncate">
                   <Link
                     href={`/account/${r.wallet}`}
                     className="text-primary hover:underline"
