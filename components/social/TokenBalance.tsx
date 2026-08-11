@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Coin, Plus, X } from 'lucide-react';
+import { Coins, Plus, X } from 'lucide-react';
 import { useSocial } from '@/context/SocialContext';
 import { usePiNetwork } from '@/context/PiNetworkContext';
 import { useLanguage } from '@/context/languagecontext';
@@ -50,7 +50,7 @@ export default function TokenBalance() {
         onClick={() => setShowBuy(!showBuy)}
         className="flex items-center gap-1.5 bg-accent/10 text-accent rounded px-2.5 py-1.5 text-sm font-semibold hover:bg-accent/20 transition-colors"
       >
-        <Coin className="w-3.5 h-3.5" />
+        <Coins className="w-3.5 h-3.5" />
         {tokenBalance ? tokenBalance.balance.toFixed(2) : '0.00'} ZP
         <Plus className="w-3 h-3 opacity-70" />
       </button>
