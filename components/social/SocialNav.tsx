@@ -11,13 +11,13 @@ export default function SocialNav() {
   const { t } = useLanguage();
 
   const navItems = [
-    { href: '/social', label: t('social.hub'), icon: Home },
-    { href: '/social/feed', label: t('social.feed'), icon: Flame },
-    { href: '/social/leaderboard', label: t('social.leaderboard'), icon: Trophy },
-    { href: '/social/badges', label: t('social.badges'), icon: Award },
-    { href: '/social/tokens', label: t('social.tokens'), icon: DollarSign },
-    { href: '/social/ads', label: t('social.earn'), icon: Video },
-    { href: '/social/moderation', label: t('social.moderate'), icon: Shield },
+    { href: '/social', label: String(t('social.hub')), icon: Home },
+    { href: '/social/feed', label: String(t('social.feed')), icon: Flame },
+    { href: '/social/leaderboard', label: String(t('social.leaderboard')), icon: Trophy },
+    { href: '/social/badges', label: String(t('social.badges')), icon: Award },
+    { href: '/social/tokens', label: String(t('social.tokens')), icon: DollarSign },
+    { href: '/social/ads', label: String(t('social.earn')), icon: Video },
+    { href: '/social/moderation', label: String(t('social.moderate')), icon: Shield },
   ];
 
   return (

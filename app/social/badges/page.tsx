@@ -66,11 +66,11 @@ export default function BadgesPage() {
 
   const categories = ['special', 'follower_based', 'achievement', 'paid', 'moderator'];
   const categoryLabels: Record<string, string> = {
-    special: t('social.badge_special'),
-    follower_based: t('social.badge_follower'),
-    achievement: t('social.badge_achievement'),
-    paid: t('social.badge_premium'),
-    moderator: t('social.badge_moderation'),
+    special: String(t('social.badge_special')),
+    follower_based: String(t('social.badge_follower')),
+    achievement: String(t('social.badge_achievement')),
+    paid: String(t('social.badge_premium')),
+    moderator: String(t('social.badge_moderation')),
   };
   const categoryIcons: Record<string, any> = { special: Star, follower_based: Star, achievement: Award, paid: ShoppingCart, moderator: Shield };
 

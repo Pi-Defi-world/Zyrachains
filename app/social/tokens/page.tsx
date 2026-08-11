@@ -41,22 +41,22 @@ export default function TokensPage() {
 
   const txLabel = (type: string): string => {
     const map: Record<string, string> = {
-      purchase: t('social.tx_purchase'),
-      post_cost: t('social.tx_post'),
-      comment_cost: t('social.tx_comment'),
-      like_cost: t('social.tx_like'),
-      dislike_cost: t('social.tx_dislike'),
-      tip: t('social.tx_tip'),
-      reshare_cost: t('social.tx_reshare'),
-      boost_cost: t('social.tx_boost'),
-      ad_reward: t('social.tx_ad_reward'),
-      moderation_reward: t('social.tx_mod_reward'),
-      moderation_loss: t('social.tx_mod_loss'),
-      badge_purchase: t('social.tx_badge'),
-      mission_reward: t('social.tx_mission'),
-      refund: t('social.tx_refund'),
-      platform_fee: t('social.tx_platform_fee'),
-      creator_earning: t('social.tx_creator_earning'),
+      purchase: String(t('social.tx_purchase')),
+      post_cost: String(t('social.tx_post')),
+      comment_cost: String(t('social.tx_comment')),
+      like_cost: String(t('social.tx_like')),
+      dislike_cost: String(t('social.tx_dislike')),
+      tip: String(t('social.tx_tip')),
+      reshare_cost: String(t('social.tx_reshare')),
+      boost_cost: String(t('social.tx_boost')),
+      ad_reward: String(t('social.tx_ad_reward')),
+      moderation_reward: String(t('social.tx_mod_reward')),
+      moderation_loss: String(t('social.tx_mod_loss')),
+      badge_purchase: String(t('social.tx_badge')),
+      mission_reward: String(t('social.tx_mission')),
+      refund: String(t('social.tx_refund')),
+      platform_fee: String(t('social.tx_platform_fee')),
+      creator_earning: String(t('social.tx_creator_earning')),
     };
     return map[type] || type;
   };
