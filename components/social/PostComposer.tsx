@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Image, X, Hash } from 'lucide-react';
+import { X, Hash } from 'lucide-react';
 import { useSocial } from '@/context/SocialContext';
 import { useLanguage } from '@/context/languagecontext';
 
@@ -10,7 +10,7 @@ interface PostComposerProps {
 }
 
 export default function PostComposer({ onClose }: PostComposerProps) {
-  const { createPost, tokenBalance } = useSocial();
+  const { createPost } = useSocial();
   const { t } = useLanguage();
   const [content, setContent] = useState('');
   const [tags, setTags] = useState<string[]>([]);
@@ -18,14 +18,9 @@ export default function PostComposer({ onClose }: PostComposerProps) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  const POST_COST = 2;
-
   const handleSubmit = async () => {
     if (!content.trim()) return setError(t('social.composer_error_required'));
     if (content.length > 2000) return setError(t('social.composer_error_chars', { max: 2000 }));
-    if (tokenBalance && tokenBalance.balance < POST_COST) {
-      return setError(t('social.composer_error_balance', { cost: POST_COST }));
-    }
 
     setSubmitting(true);
     setError('');
@@ -48,12 +43,12 @@ export default function PostComposer({ onClose }: PostComposerProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-lg shadow-2xl">
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="font-semibold text-gray-900 dark:text-white text-lg">{t('social.createPost')}</h2>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-            <X className="w-5 h-5 text-gray-500" />
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
+      <div className="bg-card border border-border rounded-lg w-full max-w-lg shadow-md">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+          <h2 className="text-sm font-semibold text-foreground">{t('social.createPost')}</h2>
+          <button onClick={onClose} className="p-1 rounded hover:bg-secondary text-muted-foreground hover:text-foreground">
+            <X className="w-4 h-4" />
           </button>
         </div>
 
@@ -64,16 +59,13 @@ export default function PostComposer({ onClose }: PostComposerProps) {
             placeholder={t('social.composer_placeholder')}
             maxLength={2000}
             rows={4}
-            className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 text-gray-900 dark:text-white placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full bg-secondary/30 border border-border rounded-lg p-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-ring"
             autoFocus
           />
-          <div className="text-xs text-gray-400 mt-1 text-right">
-            {t('social.composer_chars', { current: content.length, max: 2000 })}
-          </div>
 
-          <div className="flex gap-2 mt-3 flex-wrap">
+          <div className="flex gap-1.5 mt-3 flex-wrap">
             {tags.map((tag, i) => (
-              <span key={i} className="text-xs bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span key={i} className="text-[10px] bg-accent/10 text-accent px-2 py-0.5 rounded flex items-center gap-1">
                 #{tag}
                 <button onClick={() => setTags(tags.filter((_, j) => j !== i))}>
                   <X className="w-3 h-3" />
@@ -83,35 +75,30 @@ export default function PostComposer({ onClose }: PostComposerProps) {
           </div>
 
           <div className="flex items-center gap-2 mt-2">
-            <Hash className="w-4 h-4 text-gray-400" />
+            <Hash className="w-4 h-4 text-muted-foreground" />
             <input
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
               placeholder={t('social.composer_tags')}
-              className="flex-1 text-sm bg-transparent border-none outline-none text-gray-700 dark:text-gray-300 placeholder-gray-400"
+              className="flex-1 text-sm bg-transparent border-none outline-none text-foreground placeholder:text-muted-foreground"
             />
           </div>
 
           {error && (
-            <div className="mt-3 text-sm text-red-500 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg">
+            <div className="mt-3 text-xs text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
               {error}
             </div>
           )}
 
           <div className="flex items-center justify-between mt-4">
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              {t('social.composer_cost', { cost: POST_COST })}
-              {tokenBalance && (
-                <span className="ml-2">
-                  {t('social.composer_balance', { balance: tokenBalance.balance.toFixed(2) })}
-                </span>
-              )}
+            <span className="text-[10px] text-muted-foreground">
+              {t('social.composer_chars', { current: content.length, max: 2000 })}
             </span>
             <button
               onClick={handleSubmit}
               disabled={submitting || !content.trim()}
-              className="px-5 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-medium text-sm hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              className="px-4 py-2 bg-accent text-accent-foreground rounded-md text-xs font-semibold hover:bg-accent/90 disabled:opacity-50 transition-colors"
             >
               {submitting ? t('social.posting') : t('social.post_submit')}
             </button>

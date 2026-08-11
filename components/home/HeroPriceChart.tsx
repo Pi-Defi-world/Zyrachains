@@ -83,7 +83,7 @@ export function HeroPriceChart({ initial }: { initial: HeroPriceData }) {
                   className="inline-flex items-center gap-1 text-[10px] font-semibold text-muted-foreground border border-border rounded px-1.5 py-0.5"
                 >
                   <ShieldCheck className="h-3 w-3 text-success" />
-                  {confidence}% conf.
+                  {confidence}%
                 </span>
               )}
             </div>

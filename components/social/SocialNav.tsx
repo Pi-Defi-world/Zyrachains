@@ -3,10 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  Home, Flame, Compass, Shield, Award, Trophy,
-  DollarSign, Video, Users, TrendingUp,
-} from 'lucide-react';
+import { Home, Flame, Trophy, Award, DollarSign, Video, Shield } from 'lucide-react';
 import { useLanguage } from '@/context/languagecontext';
 
 export default function SocialNav() {
@@ -24,7 +21,7 @@ export default function SocialNav() {
   ];
 
   return (
-    <div className="flex flex-col gap-0.5">
+    <div className="space-y-0.5">
       {navItems.map((item) => {
         const Icon = item.icon;
         const active = pathname === item.href || pathname?.startsWith(item.href + '/');
@@ -32,13 +29,13 @@ export default function SocialNav() {
           <Link
             key={item.href}
             href={item.href}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+            className={`flex items-center gap-3 px-3 py-2 rounded-md text-xs transition-colors ${
               active
-                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-sm'
-                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                ? 'bg-accent/10 text-accent font-medium'
+                : 'text-muted-foreground hover:text-foreground hover:bg-secondary/40'
             }`}
           >
-            <Icon className="w-5 h-5" />
+            <span className="w-1 h-1 rounded-full bg-current opacity-40 flex-shrink-0" />
             {item.label}
           </Link>
         );

@@ -17,7 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowUpRight, ArrowDownRight, Building2, Users, ExternalLink, Activity } from 'lucide-react';
 import type { SnapshotResponse } from '@/lib/server-fetch';
 
-type TabType = 'overview' | 'wallets' | 'transactions' | 'assets' | 'pools' | 'supply' | 'network' | 'monitors' | 'ecosystem';
+type TabType = 'overview' | 'wallets' | 'transactions' | 'assets' | 'pools' | 'supply' | 'network' | 'monitors' | 'social';
 type MonitorSubTab = 'pct' | 'cex';
 
 const tabs: { id: TabType; label: string }[] = [
@@ -29,7 +29,6 @@ const tabs: { id: TabType; label: string }[] = [
   { id: 'supply', label: 'Supply' },
   { id: 'network', label: 'Network' },
   { id: 'monitors', label: 'Monitors' },
-  { id: 'ecosystem', label: 'Ecosystem' },
   { id: 'social', label: 'Social' },
 ];
 
@@ -71,22 +70,10 @@ type TopWalletsData = {
   wallets: WalletItem[];
 };
 
-type EcoData = {
-  communities: Array<{
-    Name?: string;
-    Members?: number;
-    Category?: string;
-    Region?: string;
-  }>;
-  influencers: Record<string, unknown>[];
-};
-
 interface HomePageProps {
   hero: SnapshotResponse<HeroData>;
   pulse: SnapshotResponse<PulseData>;
   wallets: SnapshotResponse<TopWalletsData>;
-  eco: SnapshotResponse<EcoData>;
-  ecosystemFallback: React.ReactNode;
   assets?: Record<string, unknown>[];
   pools?: Record<string, unknown>[];
   tickerVolumeUsd?: number | null;
@@ -107,7 +94,7 @@ function SectionSkeleton({ className, count }: { className: string; count: numbe
 }
 
 export function HomePage({
-  hero, pulse, wallets, eco, ecosystemFallback,
+  hero, pulse, wallets,
   assets = [], pools = [], tickerVolumeUsd = null, tickerPairs = null,
 }: HomePageProps) {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
@@ -116,7 +103,6 @@ export function HomePage({
   const heroData = hero.success && hero.data ? hero.data : null;
   const pulseData = pulse.success && pulse.data ? pulse.data : null;
   const walletsData = wallets.success && wallets.data ? wallets.data : null;
-  const ecoData = eco.success && eco.data ? eco.data : null;
 
   return (
     <>
@@ -331,16 +317,6 @@ export function HomePage({
             </div>
           )}
 
-          {/* Ecosystem Tab */}
-          {activeTab === 'ecosystem' && (
-            <div className="space-y-6 sm:space-y-8 animate-in fade-in-0">
-              <section className="space-y-3">
-                <h2 className="text-xl sm:text-2xl font-bold text-foreground">Community & Ecosystem</h2>
-                {ecoData ? <EcosystemSectionContent data={ecoData} /> : ecosystemFallback}
-              </section>
-            </div>
-          )}
-
           {/* Social Tab */}
           {activeTab === 'social' && (
             <div className="space-y-6 sm:space-y-8 animate-in fade-in-0">
@@ -442,81 +418,4 @@ function PulseSectionContent({ data }: { data: PulseData | null }) {
   );
 }
 
-function EcosystemSectionContent({ data }: { data: EcoData }) {
-  const communities = data.communities || [];
-  const totalCommunities = communities.length;
-  const totalMembers = communities.reduce((s, c) => s + (c.Members || 0), 0);
-  const categories = [...new Set(communities.map((c) => c.Category || 'Other'))];
-  const topCommunities = communities
-    .slice()
-    .sort((a, b) => (b.Members || 0) - (a.Members || 0))
-    .slice(0, 8);
-  const fmtN = (n: number) => n.toLocaleString('en-US');
-
-  return (
-    <section className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-3">
-      <Card className="lg:col-span-1 border border-border bg-card">
-        <CardHeader className="pb-2 px-4 pt-4 sm:px-5 sm:pt-5">
-          <CardTitle className="text-sm font-semibold flex items-center gap-2">
-            <ExternalLink className="h-4 w-4" />
-            Ecosystem Overview
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="px-4 pb-4 sm:px-5 sm:pb-5 space-y-3 text-sm">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Total Communities</span>
-            <span className="font-semibold">{fmtN(totalCommunities)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Total Members</span>
-            <span className="font-semibold">{fmtN(totalMembers)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Categories</span>
-            <span className="font-semibold">{categories.length}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Avg Members</span>
-            <span className="font-semibold">
-              {totalCommunities > 0 ? fmtN(Math.round(totalMembers / totalCommunities)) : '0'}
-            </span>
-          </div>
-          <div className="pt-2">
-            <Link href="/ecology" className="text-xs text-primary hover:underline">
-              View full ecosystem →
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="lg:col-span-2 border border-border bg-card">
-        <CardHeader className="pb-2 px-4 pt-4 sm:px-5 sm:pt-5">
-          <CardTitle className="text-sm font-semibold flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            Largest Communities
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="px-4 pb-4 sm:px-5 sm:pb-5">
-          {topCommunities.length === 0 ? (
-            <p className="text-xs text-muted-foreground">No community data available.</p>
-          ) : (
-            <div className="space-y-1.5">
-              {topCommunities.map((c, i) => (
-                <div key={c.Name || i} className="flex items-center justify-between gap-3 py-1.5 border-b border-border/30 last:border-0">
-                  <div className="flex items-center gap-2 min-w-0 flex-1">
-                    <span className="text-xs font-mono text-muted-foreground w-5 shrink-0 text-right">#{i + 1}</span>
-                    <span className="text-sm font-medium truncate">{c.Name}</span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-foreground shrink-0">
-                      {c.Category || 'General'}
-                    </span>
-                  </div>
-                  <span className="text-sm font-semibold shrink-0">{fmtN(c.Members || 0)}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </section>
-  );
-}
+export function PulseSectionContent({ data }: { data: PulseData | null }) {

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Heart, MessageCircle, Repeat2, TrendingUp, Flag, DollarSign } from 'lucide-react';
+import Link from 'next/link';
+import { Heart, MessageCircle, Repeat2, TrendingUp, DollarSign } from 'lucide-react';
 import { useSocial } from '@/context/SocialContext';
 import { useLanguage } from '@/context/languagecontext';
 import TipModal from './TipModal';
@@ -23,77 +24,66 @@ export default function PostActions({ post, detail = false }: PostActionsProps) 
   const handleLike = async () => {
     if (liked) return;
     setAnimating('like');
-    try {
-      await likePost(post._id);
-      setLiked(true);
-    } catch (err) {}
+    try { await likePost(post._id); setLiked(true); } catch (err) {}
     setTimeout(() => setAnimating(null), 600);
   };
 
   const handleReshare = async () => {
     setAnimating('reshare');
-    try {
-      await resharePost(post._id);
-    } catch (err) {}
+    try { await resharePost(post._id); } catch (err) {}
     setTimeout(() => setAnimating(null), 600);
-  };
-
-  const openComments = () => {
-    if (typeof window !== 'undefined') {
-      window.location.href = `/social/post/${post._id}`;
-    }
   };
 
   return (
     <>
-      <div className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+      <div className="flex items-center gap-4 mt-3 pt-3 border-t border-border">
         <button
           onClick={handleLike}
-          className={`flex items-center gap-1.5 text-sm transition-all ${
-            liked ? 'text-red-500' : 'text-gray-500 dark:text-gray-400 hover:text-red-500'
+          className={`inline-flex items-center gap-1 text-xs transition-all ${
+            liked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'
           } ${animating === 'like' ? 'scale-125' : ''}`}
         >
-          <Heart className={`w-4 h-4 ${liked ? 'fill-current' : ''}`} />
-          <span>{post.like_count || 0}</span>
+          <Heart className={`w-3.5 h-3.5 ${liked ? 'fill-current' : ''}`} />
+          <span className="font-medium">{post.like_count || 0}</span>
         </button>
 
-        <button
-          onClick={openComments}
-          className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-blue-500 transition-colors"
+        <Link
+          href={`/social/post/${post._id}`}
+          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-blue-500 transition-colors"
         >
-          <MessageCircle className="w-4 h-4" />
-          <span>{post.comment_count || 0}</span>
-        </button>
+          <MessageCircle className="w-3.5 h-3.5" />
+          <span className="font-medium">{post.comment_count || 0}</span>
+        </Link>
 
         <button
           onClick={handleReshare}
-          className={`flex items-center gap-1.5 text-sm transition-all ${
-            animating === 'reshare' ? 'scale-125 text-green-500' : 'text-gray-500 dark:text-gray-400 hover:text-green-500'
+          className={`inline-flex items-center gap-1 text-xs transition-all ${
+            animating === 'reshare' ? 'scale-125 text-green-500' : 'text-muted-foreground hover:text-green-500'
           }`}
         >
-          <Repeat2 className="w-4 h-4" />
-          <span>{post.reshare_count || 0}</span>
+          <Repeat2 className="w-3.5 h-3.5" />
+          <span className="font-medium">{post.reshare_count || 0}</span>
         </button>
 
         <button
           onClick={() => setShowTip(true)}
-          className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-yellow-500 transition-colors"
+          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-yellow-600 transition-colors"
         >
-          <DollarSign className="w-4 h-4" />
+          <DollarSign className="w-3.5 h-3.5" />
           <span>{t('social.tip')}</span>
         </button>
 
         <button
           onClick={() => setShowBoost(true)}
-          className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-purple-500 transition-colors ml-auto"
+          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-accent transition-colors ml-auto"
         >
-          <TrendingUp className="w-4 h-4" />
+          <TrendingUp className="w-3.5 h-3.5" />
           <span>{t('social.boost')}</span>
         </button>
       </div>
 
       {post.tips_received > 0 && (
-        <div className="mt-2 text-xs text-yellow-600 dark:text-yellow-400 flex items-center gap-1">
+        <div className="mt-2 text-[10px] text-yellow-600 flex items-center gap-1">
           <DollarSign className="w-3 h-3" />
           {t('social.tip_earned', { amount: post.tips_received })}
         </div>

@@ -11,25 +11,15 @@ import { Plus, Loader2 } from 'lucide-react';
 
 export default function FeedPage() {
   const { isAuthenticated } = usePiNetwork();
-  const { feed, feedType, feedLoading, hasMore, loadFeed, loadMoreFeed } = useSocial();
+  const { feed, feedLoading, hasMore, loadFeed, loadMoreFeed } = useSocial();
   const { t } = useLanguage();
   const [showComposer, setShowComposer] = React.useState(false);
   const observerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    loadFeed(feedType, 1);
-  }, [feedType, loadFeed]);
-
+  useEffect(() => { loadFeed('trending', 1); }, []);
   useEffect(() => {
     if (!observerRef.current) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !feedLoading) {
-          loadMoreFeed();
-        }
-      },
-      { threshold: 0.5 }
-    );
+    const observer = new IntersectionObserver((entries) => { if (entries[0].isIntersecting && hasMore && !feedLoading) loadMoreFeed(); }, { threshold: 0.5 });
     observer.observe(observerRef.current);
     return () => observer.disconnect();
   }, [hasMore, feedLoading, loadMoreFeed]);
@@ -37,8 +27,8 @@ export default function FeedPage() {
   if (!isAuthenticated) {
     return (
       <div className="text-center py-20">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{t('social.feed')}</h1>
-        <p className="text-gray-500">{t('social.connect_feed')}</p>
+        <h1 className="text-heading-md text-foreground mb-2">{t('social.feed')}</h1>
+        <p className="text-sm text-muted-foreground">{t('social.connect_feed')}</p>
       </div>
     );
   }
@@ -46,41 +36,27 @@ export default function FeedPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white lg:hidden">{t('social.feed')}</h1>
-        <button
-          onClick={() => setShowComposer(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg text-sm font-medium hover:from-purple-700 hover:to-pink-700 lg:hidden"
-        >
-          <Plus className="w-4 h-4" /> {t('social.post_submit')}
+        <h1 className="text-heading-sm text-foreground lg:hidden">{t('social.feed')}</h1>
+        <button onClick={() => setShowComposer(true)} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent text-accent-foreground rounded-md text-xs font-semibold hover:bg-accent/90 lg:hidden">
+          <Plus className="w-3.5 h-3.5" /> {t('social.post_submit')}
         </button>
       </div>
 
       <FeedTabs />
 
-      <button
-        onClick={() => setShowComposer(true)}
-        className="hidden lg:flex items-center gap-2 w-full px-4 py-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm mb-4 hover:border-purple-300 dark:hover:border-purple-600 cursor-text"
-      >
-        <Plus className="w-4 h-4" /> {t('social.composer_placeholder')} ({t('social.post_cost', { cost: 2 })})
+      <button onClick={() => setShowComposer(true)} className="hidden lg:flex items-center gap-2 w-full px-4 py-3 card-elevated text-muted-foreground text-sm mb-4 hover:border-accent/40 cursor-text">
+        <Plus className="w-4 h-4" /> {t('social.composer_placeholder')}
       </button>
 
       {feed.length === 0 && !feedLoading ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500 dark:text-gray-400">{t('social.noPosts')}</p>
-        </div>
+        <div className="text-center py-12"><p className="text-sm text-muted-foreground">{t('social.noPosts')}</p></div>
       ) : (
-        <>
-          {feed.map((post) => (
-            <PostCard key={post._id} post={post} />
-          ))}
-        </>
+        <>{feed.map((post) => (<PostCard key={post._id} post={post} />))}</>
       )}
 
       <div ref={observerRef} className="h-10 flex items-center justify-center">
-        {feedLoading && <Loader2 className="w-6 h-6 text-purple-500 animate-spin" />}
-        {!hasMore && feed.length > 0 && (
-          <p className="text-sm text-gray-400">{t('social.noMorePosts')}</p>
-        )}
+        {feedLoading && <Loader2 className="w-5 h-5 text-accent animate-spin" />}
+        {!hasMore && feed.length > 0 && <p className="text-xs text-muted-foreground">{t('social.noMorePosts')}</p>}
       </div>
 
       {showComposer && <PostComposer onClose={() => setShowComposer(false)} />}

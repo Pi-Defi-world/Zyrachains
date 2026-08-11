@@ -49,16 +49,6 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    label: 'Ecosystem', icon: <Globe className="h-4 w-4" />,
-    links: [
-      { href: '/ecology', label: 'Ecology Hub' },
-      { href: '/ecosystem/communities', label: 'Communities' },
-      { href: '/ecosystem/events', label: 'Events' },
-      { href: '/ecosystem/hackathons', label: 'Hackathons' },
-      { href: '/ecosystem/influencers', label: 'Influencers' },
-    ],
-  },
-  {
     label: 'Data & API', icon: <Zap className="h-4 w-4" />,
     links: [
       { href: '/api-dashboard', label: 'API Dashboard' },

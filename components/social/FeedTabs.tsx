@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Flame, Clock, Users, Compass } from 'lucide-react';
+import { Flame, Clock, Users } from 'lucide-react';
 import { useSocial } from '@/context/SocialContext';
 import { useLanguage } from '@/context/languagecontext';
 
@@ -16,7 +16,7 @@ export default function FeedTabs() {
   const { t } = useLanguage();
 
   return (
-    <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1 mb-4">
+    <div className="border-b border-border mb-6 flex gap-0 overflow-x-auto">
       {tabs.map((tab) => {
         const Icon = tab.icon;
         const active = feedType === tab.key;
@@ -24,13 +24,13 @@ export default function FeedTabs() {
           <button
             key={tab.key}
             onClick={() => setFeedType(tab.key)}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-md text-sm font-medium transition-all ${
+            className={`inline-flex items-center gap-1.5 px-4 py-3 text-xs font-semibold border-b-2 transition-all duration-200 whitespace-nowrap ${
               active
-                ? 'bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 shadow-sm'
-                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                ? 'border-accent text-accent bg-accent/5 hover:bg-accent/10'
+                : 'border-transparent text-foreground/60 hover:text-foreground/80 hover:bg-secondary/30'
             }`}
           >
-            <Icon className="w-4 h-4" />
+            <Icon className="w-3.5 h-3.5" />
             {t(tab.label)}
           </button>
         );

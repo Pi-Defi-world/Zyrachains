@@ -2,7 +2,6 @@ export const dynamic = 'force-dynamic';
 
 import { fetchSnapshot } from '@/lib/server-fetch';
 import { HomePage } from '@/components/home/HomePage';
-import { HomeEcosystemSection } from '@/components/home/HomeEcosystemSection';
 
 type HeroData = {
   priceUsd: number;
@@ -40,18 +39,6 @@ type WalletItem = {
 
 type TopWalletsData = {
   wallets: WalletItem[];
-};
-
-type CommunityItem = {
-  Name?: string;
-  Members?: number;
-  Category?: string;
-  Region?: string;
-};
-
-type EcoData = {
-  communities: CommunityItem[];
-  influencers: Record<string, unknown>[];
 };
 
 type AssetRecord = Record<string, unknown>;
@@ -112,11 +99,10 @@ function computeVolume(records: TradeRecord[], priceUsd: number): { volumeUsd: n
 }
 
 export default async function Page() {
-  const [heroRes, pulseRes, walletsRes, ecoRes, testnetData, tradesRes] = await Promise.all([
+  const [heroRes, pulseRes, walletsRes, testnetData, tradesRes] = await Promise.all([
     fetchSnapshot<HeroData>('hero', 10),
     fetchSnapshot<PulseData>('pulse', 120),
     fetchSnapshot<TopWalletsData>('top-wallets', 300),
-    fetchSnapshot<EcoData>('ecosystem-leaderboards', 600),
     fetchTestnetAssetsPools(),
     fetchSnapshot<{ records: TradeRecord[] }>('latest-trades', 20),
   ]);
@@ -134,8 +120,6 @@ export default async function Page() {
       hero={heroRes}
       pulse={pulseRes}
       wallets={walletsRes}
-      eco={ecoRes}
-      ecosystemFallback={<HomeEcosystemSection />}
       assets={testnetData.assets}
       pools={testnetData.pools}
       tickerVolumeUsd={tickerVolumeUsd}

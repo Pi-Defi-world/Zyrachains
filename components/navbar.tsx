@@ -35,7 +35,6 @@ const Navbar: React.FC = () => {
                 <Link href="/" className="text-foreground/70 hover:text-foreground interactive-element">Home</Link>
                 <Link href="/block" className="text-foreground/70 hover:text-foreground interactive-element">Explorer</Link>
                 <Link href="/pct-wallet-monitor" className="text-foreground/70 hover:text-foreground interactive-element">Monitors</Link>
-                <Link href="/ecology" className="text-foreground/70 hover:text-foreground interactive-element">Community</Link>
                 <Link href="/social" className="text-foreground/70 hover:text-foreground interactive-element">Social</Link>
                 <Link href="/api-documentation" className="text-foreground/70 hover:text-foreground interactive-element">API</Link>
               </div>
@@ -91,9 +90,6 @@ const Navbar: React.FC = () => {
                 </Link>
                 <Link href="/pct-wallet-monitor" className="block px-4 py-3 rounded-lg text-foreground/70 hover:text-foreground hover:bg-secondary interactive-element text-sm font-medium" onClick={() => setShowMobileMenu(false)}>
                   Monitors
-                </Link>
-                <Link href="/ecology" className="block px-4 py-3 rounded-lg text-foreground/70 hover:text-foreground hover:bg-secondary interactive-element text-sm font-medium" onClick={() => setShowMobileMenu(false)}>
-                  Community
                 </Link>
                 <Link href="/social" className="block px-4 py-3 rounded-lg text-foreground/70 hover:text-foreground hover:bg-secondary interactive-element text-sm font-medium" onClick={() => setShowMobileMenu(false)}>
                   Social
@@ -187,10 +183,6 @@ const MobileBottomNav: React.FC = () => {
               <Link href="/block" className="flex flex-col items-center justify-center interactive-element px-3 py-2.5 rounded-lg text-foreground/70 hover:text-foreground hover:bg-secondary/50 flex-1">
                 <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 2h18v18H3z"/></svg>
                 <span className="text-[11px] mt-1 font-semibold">Explorer</span>
-              </Link>
-              <Link href="/ecology" className="flex flex-col items-center justify-center interactive-element px-3 py-2.5 rounded-lg text-foreground/70 hover:text-foreground hover:bg-secondary/50 flex-1">
-                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                <span className="text-[11px] mt-1 font-semibold">Community</span>
               </Link>
               <Link href="/social" className="flex flex-col items-center justify-center interactive-element px-3 py-2.5 rounded-lg text-foreground/70 hover:text-foreground hover:bg-secondary/50 flex-1">
                 <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>

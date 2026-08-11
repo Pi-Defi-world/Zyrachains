@@ -8,7 +8,7 @@ import XPBar from '@/components/social/XPBar';
 export default function SocialLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen">
-      <div className="hidden lg:block w-64 shrink-0 border-r border-gray-200 dark:border-gray-700 p-4">
+      <div className="hidden lg:block w-64 shrink-0 border-r border-border p-4 pt-6">
         <div className="mb-4">
           <TokenBalance />
         </div>

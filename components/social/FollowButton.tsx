@@ -20,40 +20,23 @@ export default function FollowButton({ targetUID, isFollowing: initialFollowing,
   const handleToggle = async () => {
     setLoading(true);
     try {
-      if (following) {
-        await unfollowUser(targetUID);
-        setFollowing(false);
-      } else {
-        await followUser(targetUID);
-        setFollowing(true);
-      }
+      if (following) { await unfollowUser(targetUID); setFollowing(false); }
+      else { await followUser(targetUID); setFollowing(true); }
       onToggle?.();
-    } catch (err) {
-      console.error('Follow toggle error:', err);
-    } finally {
-      setLoading(false);
-    }
+    } catch (err) { console.error('Follow toggle error:', err); } finally { setLoading(false); }
   };
 
   return (
     <button
       onClick={handleToggle}
       disabled={loading}
-      className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
+      className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-semibold transition-colors ${
         following
-          ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600'
-          : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 shadow-sm'
+          ? 'bg-secondary text-foreground hover:bg-destructive/10 hover:text-destructive'
+          : 'bg-accent text-accent-foreground hover:bg-accent/90'
       }`}
     >
-      {following ? (
-        <>
-          <UserCheck className="w-4 h-4" /> {t('social.following_label')}
-        </>
-      ) : (
-        <>
-          <UserPlus className="w-4 h-4" /> {t('social.follow')}
-        </>
-      )}
+      {following ? <><UserCheck className="w-3.5 h-3.5" /> {t('social.following_label')}</> : <><UserPlus className="w-3.5 h-3.5" /> {t('social.follow')}</>}
     </button>
   );
 }
