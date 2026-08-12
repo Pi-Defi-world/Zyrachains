@@ -56,7 +56,7 @@ export default function PostComposer({ onClose }: PostComposerProps) {
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder={t('social.composer_placeholder')}
+            placeholder={String(t('social.composer_placeholder'))}
             maxLength={2000}
             rows={4}
             className="w-full bg-secondary/30 border border-border rounded-lg p-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-ring"
@@ -80,7 +80,7 @@ export default function PostComposer({ onClose }: PostComposerProps) {
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-              placeholder={t('social.composer_tags')}
+              placeholder={String(t('social.composer_tags'))}
               className="flex-1 text-sm bg-transparent border-none outline-none text-foreground placeholder:text-muted-foreground"
             />
           </div>

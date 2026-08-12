@@ -82,7 +82,7 @@ export default function PostDetailPage() {
           <input
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
-            placeholder={t('social.comments_placeholder', { cost: 0.5 })}
+            placeholder={String(t('social.comments_placeholder', { cost: 0.5 }))}
             className="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
             onKeyDown={(e) => e.key === 'Enter' && handleAddComment()}
           />
