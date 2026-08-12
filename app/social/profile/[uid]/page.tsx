@@ -81,15 +81,15 @@ export default function SocialProfilePage() {
             <div className="flex items-center gap-4 mt-3 text-sm">
               <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
                 <Users className="w-4 h-4" />
-                <span className="font-semibold text-gray-900 dark:text-white">{profile.follower_count}</span> {t('social.followers', { count: 0 }).replace('0', '')}
+                <span className="font-semibold text-gray-900 dark:text-white">{profile.follower_count}</span> {String(t('social.followers', { count: profile.follower_count }))}
               </div>
               <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
                 <UserPlus className="w-4 h-4" />
-                <span className="font-semibold text-gray-900 dark:text-white">{profile.following_count}</span> {t('social.following_count', { count: 0 }).replace('0 ', '')}
+                <span className="font-semibold text-gray-900 dark:text-white">{profile.following_count}</span> {String(t('social.following_count', { count: profile.following_count }))}
               </div>
               <div className="flex items-center gap-1 text-gray-600 dark:text-gray-400">
                 <FileText className="w-4 h-4" />
-                <span className="font-semibold text-gray-900 dark:text-white">{profile.post_count}</span> {t('social.posts_count', { count: 0 }).replace('0 ', '')}
+                <span className="font-semibold text-gray-900 dark:text-white">{profile.post_count}</span> {String(t('social.posts_count', { count: profile.post_count }))}
               </div>
             </div>
 

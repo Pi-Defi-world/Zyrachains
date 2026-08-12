@@ -23,8 +23,8 @@ export default function BoostModal({ post, onClose }: BoostModalProps) {
   const boostAmount = customAmount ? parseFloat(customAmount) : amount;
 
   const handleBoost = async () => {
-    if (isNaN(boostAmount) || boostAmount < 10) return setError(t('social.boost_min_error', { min: 10 }));
-    if (tokenBalance && tokenBalance.balance < boostAmount) return setError(t('social.composer_error_balance', { cost: boostAmount }));
+    if (isNaN(boostAmount) || boostAmount < 10) return setError(String(t('social.boost_min_error', { min: 10 })));
+    if (tokenBalance && tokenBalance.balance < boostAmount) return setError(String(t('social.composer_error_balance', { cost: boostAmount })));
     setSubmitting(true); setError('');
     try { await boostPost(post._id, boostAmount); onClose(); } catch (err: any) { setError(err.message || 'Boost failed'); } finally { setSubmitting(false); }
   };

@@ -19,8 +19,8 @@ export default function PostComposer({ onClose }: PostComposerProps) {
   const [error, setError] = useState('');
 
   const handleSubmit = async () => {
-    if (!content.trim()) return setError(t('social.composer_error_required'));
-    if (content.length > 2000) return setError(t('social.composer_error_chars', { max: 2000 }));
+    if (!content.trim()) return setError(String(t('social.composer_error_required')));
+    if (content.length > 2000) return setError(String(t('social.composer_error_chars', { max: 2000 })));
 
     setSubmitting(true);
     setError('');

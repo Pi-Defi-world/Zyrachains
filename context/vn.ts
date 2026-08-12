@@ -671,7 +671,6 @@ export  const language_vi= {
     'terms.contact.title': 'Thông Tin Liên Hệ',
     'terms.contact.content': 'Nếu bạn có bất kỳ câu hỏi nào về các Điều Khoản Dịch Vụ này, vui lòng liên hệ với chúng tôi tại:',
     'terms.contact.email': 'zyrachains@gmail.com',
-    'contact.email': 'zyrachains@gmail.com',
 
     'privacy.heading': 'Chính Sách Bảo Mật',
     'privacy.title': 'Chính Sách Bảo Mật - Zyrachain Pi Network Ecosystem Hub',

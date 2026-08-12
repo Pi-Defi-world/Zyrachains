@@ -23,9 +23,9 @@ export default function TipModal({ post, onClose }: TipModalProps) {
   const tipAmount = customAmount ? parseFloat(customAmount) : amount;
 
   const handleTip = async () => {
-    if (isNaN(tipAmount) || tipAmount < 1) return setError(t('social.tip_min_error', { min: 1 }));
+    if (isNaN(tipAmount) || tipAmount < 1) return setError(String(t('social.tip_min_error', { min: 1 })));
     if (tokenBalance && tokenBalance.balance < tipAmount) {
-      return setError(t('social.composer_error_balance', { cost: tipAmount }));
+      return setError(String(t('social.composer_error_balance', { cost: tipAmount })));
     }
     setSubmitting(true);
     setError('');
