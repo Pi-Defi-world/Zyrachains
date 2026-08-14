@@ -31,12 +31,12 @@ export function MobilePiWelcome({ onAuthSuccess, onClose }: MobilePiWelcomeProps
         let shouldShow = false;
         let reason = '';
         
-        if (!hasAuthenticatedBefore) {
+        if (hasAuthenticatedBefore && (savedToken && savedUser)) {
+          shouldShow = true;
+          reason = 'Connect your Pi wallet to continue.';
+        } else if (!hasAuthenticatedBefore) {
           shouldShow = true;
           reason = 'Welcome! Connect your Pi wallet to get started.';
-        } else if (savedToken && savedUser) {
-          shouldShow = true;
-          reason = 'Your session has expired. Please reconnect your Pi wallet.';
         }
         
         if (shouldShow) {

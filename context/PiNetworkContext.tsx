@@ -97,10 +97,8 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
       if (savedToken && savedUser) {
         try {
           const userData = JSON.parse(savedUser);
-          setUser(userData);
-          setAccessToken(savedToken);
-          setIsAuthenticated(true);
-          console.log('✅ Restored authentication from localStorage');
+          // Do NOT mark as authenticated from localStorage alone —
+          // the Pi session must be re-verified with the backend first.
 
           // Re-initialize Pi SDK so payments scope stays alive
           if (typeof window !== 'undefined' && (window as any).Pi) {
@@ -113,7 +111,7 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
             }
           }
 
-          // Re-verify with backend
+          // Re-verify with backend; only restore auth if verification succeeds
           try {
             const resp = await fetch(`${getBaseUrl()}/api/pi/auth/verify`, {
               method: 'POST',
@@ -124,17 +122,28 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
               const data = await resp.json();
               if (data.user?._id) {
                 setUser(data.user);
+                setAccessToken(savedToken);
+                setIsAuthenticated(true);
                 localStorage.setItem('pi_user', JSON.stringify(data.user));
+                console.log('✅ Authentication restored after backend verification');
               }
-            } else if (resp.status === 401) {
-              console.warn('⚠️ Access token expired, clearing auth');
+            } else if (resp.status === 401 || resp.status === 403) {
+              console.warn('⚠️ Access token invalid, clearing auth');
               localStorage.removeItem('pi_access_token');
               localStorage.removeItem('pi_user');
               setUser(null);
               setAccessToken(null);
               setIsAuthenticated(false);
             }
-          } catch { /* use cached data */ }
+          } catch {
+            // Backend unreachable — do not trust cached credentials
+            console.warn('⚠️ Backend verification failed — staying signed out');
+            localStorage.removeItem('pi_access_token');
+            localStorage.removeItem('pi_user');
+            setUser(null);
+            setAccessToken(null);
+            setIsAuthenticated(false);
+          }
         } catch (error) {
           console.error('Error restoring saved authentication:', error);
           localStorage.removeItem('pi_access_token');
