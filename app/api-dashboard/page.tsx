@@ -14,10 +14,6 @@ import {
   Loader2, Copy, Check, AlertCircle, RefreshCw, Eye, Zap,
   Shield, TrendingUp, Timer, Hash, Coins
 } from 'lucide-react';
-import { getPublicBackendUrl } from '@/lib/get-backend-url';
-
-const SERVER_BASE = getPublicBackendUrl();
-
 interface ApiKeyDoc {
   _id: string;
   keyPrefix: string;
@@ -76,7 +72,7 @@ export default function ApiDashboardPage() {
     setLoadingKeys(true);
     setError(null);
     try {
-      const res = await fetch(`${SERVER_BASE}/api/oracle/keys`, { headers: getAuth() });
+      const res = await fetch('/api/oracle/keys', { headers: getAuth() });
       const data = await res.json();
       if (data.keys) setKeys(data.keys);
       else if (data.error) setError(data.error);
@@ -91,7 +87,7 @@ export default function ApiDashboardPage() {
     setLoadingUsage(true);
     setUsageData(null);
     try {
-      const res = await fetch(`${SERVER_BASE}/api/oracle/keys/${keyId}/usage`, { headers: getAuth() });
+      const res = await fetch(`/api/oracle/keys/${keyId}/usage`, { headers: getAuth() });
       const data = await res.json();
       if (data.usage) setUsageData(data.usage);
       else if (data.error) setError(data.error);
@@ -106,7 +102,7 @@ export default function ApiDashboardPage() {
     if (!confirm('Revoke this key? It will stop working immediately. This cannot be undone.')) return;
     setRevokingId(keyId);
     try {
-      const res = await fetch(`${SERVER_BASE}/api/oracle/keys/${keyId}`, {
+      const res = await fetch(`/api/oracle/keys/${keyId}`, {
         method: 'DELETE',
         headers: getAuth(),
       });

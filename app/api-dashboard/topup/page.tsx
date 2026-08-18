@@ -8,9 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Zap, Coins, ArrowLeft, CheckCircle, AlertCircle, Key } from 'lucide-react';
-import { getPublicBackendUrl } from '@/lib/get-backend-url';
-
-const SERVER_BASE = getPublicBackendUrl();
 
 interface ApiKeyDoc {
   _id: string;
@@ -49,7 +46,7 @@ export default function TopUpCreditsPage() {
   const loadKeys = useCallback(async () => {
     setLoadingKeys(true);
     try {
-      const res = await fetch(`${SERVER_BASE}/api/oracle/keys`, { headers: getAuth() });
+      const res = await fetch('/api/oracle/keys', { headers: getAuth() });
       const data = await res.json();
       if (data.keys) setKeys(data.keys.filter((k: ApiKeyDoc) => k.status === 'active'));
     } catch (e) {

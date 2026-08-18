@@ -46,7 +46,7 @@ export default function OracleApiPage() {
     if (!token) return;
     setLoadingKeys(true);
     try {
-      const res = await fetch(`${BASE}/api/oracle/keys`, {
+      const res = await fetch('/api/oracle/keys', {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
