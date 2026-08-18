@@ -114,6 +114,9 @@ export function SocialProvider({ children }: { children: ReactNode }) {
       setHasMore(page * limit < total);
     } catch (err) {
       console.error('Error loading feed:', err);
+      // Prevent the infinite retry loop in the feed's IntersectionObserver:
+      // a failed load means there is nothing more to fetch.
+      setHasMore(false);
     } finally {
       setFeedLoading(false);
     }

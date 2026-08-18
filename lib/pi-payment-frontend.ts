@@ -2,7 +2,6 @@
 import { PiSDK, PiPayment, PiPaymentRequest, PiPaymentCallbacks } from '../types/pi sdk';
 
 import { ListingType, LISTING_PAYMENTS } from './pi-network';
-import { getPublicBackendUrl } from './get-backend-url';
 
 export interface PiListingPaymentData {
   listingType: ListingType;
@@ -22,10 +21,6 @@ export interface PiPaymentResult {
   warning?: string;
   alreadyCompleted?: boolean;
   keyPrefix?: string;
-}
-
-function getBaseUrl(): string {
-  return getPublicBackendUrl();
 }
 
 export class PiListingPaymentService {
@@ -132,7 +127,7 @@ export class PiListingPaymentService {
           onReadyForServerApproval: async (paymentId: string) => {
             console.log('Payment ready for server approval:', paymentId);
             try {
-              const response = await fetch(`${getBaseUrl()}/api/pi/payments/approve`, {
+              const response = await fetch(`/api/pi/payments/approve`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ paymentId })
@@ -151,7 +146,7 @@ export class PiListingPaymentService {
             console.log('Payment ready for completion:', paymentId, txid);
             try {
               // Call Express server to complete payment and save listing
-              const response = await fetch(`${getBaseUrl()}/api/pi/payments/complete`, {
+              const response = await fetch(`/api/pi/payments/complete`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
@@ -268,7 +263,7 @@ export class PiListingPaymentService {
   private onIncompletePaymentFound = (payment: PiPayment) => {
     console.log('Incomplete payment found:', payment);
     // Cancel incomplete payment
-    fetch(`${getBaseUrl()}/api/pi/payments/cancel`, {
+    fetch(`/api/pi/payments/cancel`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ paymentId: payment.identifier })

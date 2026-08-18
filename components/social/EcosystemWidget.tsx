@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Users, Globe, Flame, Loader2 } from 'lucide-react';
+import { useLanguage } from '@/context/languagecontext';
 
 type EcoPayload = {
   communities: Array<{ Name?: string; Members?: number; Category?: string }>;
@@ -10,6 +11,7 @@ type EcoPayload = {
 };
 
 export default function EcosystemWidget() {
+  const { t } = useLanguage();
   const [data, setData] = useState<EcoPayload | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -34,7 +36,7 @@ export default function EcosystemWidget() {
   if (loading) {
     return (
       <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground py-3">
-        <Loader2 className="w-3.5 h-3.5 animate-spin" /> Ecosystem…
+        <Loader2 className="w-3.5 h-3.5 animate-spin" /> {t('social.eco_loading')}
       </div>
     );
   }
@@ -56,30 +58,30 @@ export default function EcosystemWidget() {
   return (
     <div className="rounded-lg border border-border bg-card p-3 text-xs">
       <div className="flex items-center gap-1.5 font-semibold text-foreground mb-2">
-        <Globe className="w-3.5 h-3.5 text-accent" /> Ecosystem Analytics
+        <Globe className="w-3.5 h-3.5 text-accent" /> {t('social.eco_analytics')}
       </div>
 
       <div className="grid grid-cols-2 gap-2 mb-2">
         <div className="rounded bg-muted/50 px-2 py-1.5">
           <p className="text-[10px] text-muted-foreground flex items-center gap-1">
-            <Users className="w-2.5 h-2.5" /> Communities
+            <Users className="w-2.5 h-2.5" /> {t('social.eco_communities')}
           </p>
           <p className="font-semibold text-foreground">{totalCommunities.toLocaleString()}</p>
-          <p className="text-[10px] text-muted-foreground">{totalMembers.toLocaleString()} members</p>
+          <p className="text-[10px] text-muted-foreground">{t('social.eco_members_count', { count: totalMembers.toLocaleString() })}</p>
         </div>
         <div className="rounded bg-muted/50 px-2 py-1.5">
           <p className="text-[10px] text-muted-foreground flex items-center gap-1">
-            <Flame className="w-2.5 h-2.5" /> Influencers
+            <Flame className="w-2.5 h-2.5" /> {t('social.eco_influencers')}
           </p>
           <p className="font-semibold text-foreground">{totalInfluencers.toLocaleString()}</p>
-          <p className="text-[10px] text-muted-foreground">{totalFollowers.toLocaleString()} followers</p>
+          <p className="text-[10px] text-muted-foreground">{t('social.eco_followers_count', { count: totalFollowers.toLocaleString() })}</p>
         </div>
       </div>
 
       {topCommunities.length > 0 && (
         <>
           <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">
-            Top Communities
+            {t('social.eco_top_communities')}
           </p>
           <div className="space-y-1">
             {topCommunities.map((c, i) => (
@@ -97,13 +99,13 @@ export default function EcosystemWidget() {
 
       <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 pt-2 border-t border-border">
         <Link href="/ecosystem/communities" className="text-accent hover:underline">
-          Communities →
+          {t('social.eco_communities')} →
         </Link>
         <Link href="/ecosystem/influencers" className="text-accent hover:underline">
-          Influencers →
+          {t('social.eco_influencers')} →
         </Link>
         <Link href="/ecosystem" className="text-accent hover:underline">
-          All →
+          {t('social.eco_all')}
         </Link>
       </div>
     </div>

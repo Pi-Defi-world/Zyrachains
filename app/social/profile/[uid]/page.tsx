@@ -6,6 +6,7 @@ import { useSocial } from '@/context/SocialContext';
 import { usePiNetwork } from '@/context/PiNetworkContext';
 import { useLanguage } from '@/context/languagecontext';
 import { socialAPI } from '@/lib/social-api-client';
+import { useToast } from '@/components/context/ToastContext';
 import FollowButton from '@/components/social/FollowButton';
 import BadgeDisplay from '@/components/social/BadgeDisplay';
 import PostCard from '@/components/social/PostCard';
@@ -17,6 +18,7 @@ export default function SocialProfilePage() {
   const { user: currentUser } = usePiNetwork();
   const { getProfile } = useSocial();
   const { t } = useLanguage();
+  const { showToast } = useToast();
   const [profile, setProfile] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,9 +70,9 @@ export default function SocialProfilePage() {
     const url = `${window.location.origin}/social/profile/${uid}`;
     try {
       await navigator.clipboard.writeText(url);
-      alert('Profile link copied to clipboard');
+      showToast(String(t('social.profile_share_copied')), 'success');
     } catch (err) {
-      alert('Could not copy link');
+      showToast(String(t('social.share_failed')), 'error');
     }
   };
 

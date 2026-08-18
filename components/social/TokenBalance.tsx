@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Coins, Plus, X } from 'lucide-react';
 import { useSocial } from '@/context/SocialContext';
 import { usePiNetwork } from '@/context/PiNetworkContext';
@@ -15,6 +15,21 @@ export default function TokenBalance() {
   const [buying, setBuying] = useState(false);
   const [buyError, setBuyError] = useState('');
   const [buySuccess, setBuySuccess] = useState(false);
+  // Live conversion rate from the backend (defaults to 10 ZP/Pi, same as the
+  // backend DEFAULT_SETTINGS.zp_per_pi). No hardcoded 100 anywhere.
+  const [zpPerPi, setZpPerPi] = useState(10);
+
+  useEffect(() => {
+    fetch('/api/pi/payments/config/social_tokens')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        const rate = data?.config?.zp_per_pi;
+        if (typeof rate === 'number' && rate > 0) setZpPerPi(rate);
+      })
+      .catch(() => {});
+  }, []);
+
+  const zpAmount = piAmount * zpPerPi;
 
   const handleBuy = async () => {
     if (!piAmount || piAmount < 0.01) return;
@@ -25,7 +40,7 @@ export default function TokenBalance() {
     try {
       const result = await createPayment({
         amount: piAmount,
-        memo: `${t('social.buy_receive', { amount: piAmount * 100 })}`,
+        memo: `${t('social.buy_receive', { amount: zpAmount })}`,
         metadata: {
           listingType: 'social_tokens',
           listingData: { piAmount, userId: user.uid },
@@ -80,7 +95,7 @@ export default function TokenBalance() {
                   <Coins className="w-7 h-7 text-accent" />
                 </div>
                 <p className="text-sm font-semibold text-foreground mb-1">
-                  {t('social.buy_receive', { amount: piAmount * 100 })}
+                  {t('social.buy_receive', { amount: zpAmount.toFixed(2) })}
                 </p>
                 <p className="text-xs text-muted-foreground mb-4">
                   {tokenBalance ? t('social.buy_current_balance', { balance: tokenBalance.balance.toFixed(2) }) : ''}
@@ -95,7 +110,7 @@ export default function TokenBalance() {
             ) : (
               <div className="p-4">
                 <div className="bg-accent/10 rounded-lg p-3 mb-4 text-center">
-                  <p className="text-lg font-bold text-accent">{t('social.buy_rate')}</p>
+                  <p className="text-lg font-bold text-accent">{t('social.buy_rate', { rate: zpPerPi })}</p>
                 </div>
 
                 <label className="text-xs text-muted-foreground mb-1 block">{t('social.buy_pi_amount')}</label>
@@ -122,7 +137,7 @@ export default function TokenBalance() {
                 />
 
                 <p className="mt-2 text-sm text-center text-foreground">
-                  {t('social.buy_receive', { amount: piAmount * 100 })}
+                  {t('social.buy_receive', { amount: zpAmount.toFixed(2) })}
                 </p>
 
                 {tokenBalance && (

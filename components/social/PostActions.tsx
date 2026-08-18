@@ -26,13 +26,13 @@ export default function PostActions({ post, detail = false }: PostActionsProps) 
   const handleLike = async () => {
     if (liked) return;
     setAnimating('like');
-    try { await likePost(post._id); setLiked(true); showToast('Post liked', 'success'); } catch (err) {}
+    try { await likePost(post._id); setLiked(true); showToast(String(t('social.post_liked')), 'success'); } catch (err) {}
     setTimeout(() => setAnimating(null), 600);
   };
 
   const handleReshare = async () => {
     setAnimating('reshare');
-    try { await resharePost(post._id); showToast('Post reshared', 'success'); } catch (err) {}
+    try { await resharePost(post._id); showToast(String(t('social.post_reshared')), 'success'); } catch (err) {}
     setTimeout(() => setAnimating(null), 600);
   };
 
@@ -40,9 +40,9 @@ export default function PostActions({ post, detail = false }: PostActionsProps) 
     const url = `${window.location.origin}/social/post/${post._id}`;
     try {
       await navigator.clipboard.writeText(url);
-      showToast('Post link copied to clipboard', 'success');
+      showToast(String(t('social.share_copied')), 'success');
     } catch (err) {
-      showToast('Could not copy link', 'error');
+      showToast(String(t('social.share_failed')), 'error');
     }
   };
 

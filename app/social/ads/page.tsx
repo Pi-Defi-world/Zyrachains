@@ -66,17 +66,17 @@ export default function AdsPage() {
         const verified = await PiAdsService.verifyRewardedAd(result.adId, accessToken || '');
         if (verified) {
           await refreshBalance();
-          showToast('+5 ZP earned from Pi Ads!', 'success');
+          showToast(String(t('social.ads_pi_earned', { amount: 5 })), 'success');
           const refreshed = await socialAPI.getAds();
           setAdsData(refreshed.data);
         } else {
-          showToast('Ad verification failed', 'warning');
+          showToast(String(t('social.ads_pi_failed')), 'warning');
         }
       } else {
-        showToast('Pi Ads not available right now', 'info');
+        showToast(String(t('social.ads_pi_unavailable')), 'info');
       }
     } catch (err: any) {
-      showToast(err.message || 'Pi Ads failed', 'error');
+      showToast(err.message || t('social.ads_pi_unavailable'), 'error');
     } finally {
       setShowingPiAd(false);
     }
@@ -123,8 +123,8 @@ export default function AdsPage() {
                 <ExternalLink className="w-4 h-4 text-accent" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-foreground">Pi Network Ads</p>
-                <p className="text-xs text-muted-foreground">Watch a Pi rewarded ad to earn 5 ZP</p>
+                <p className="text-sm font-semibold text-foreground">{t('social.ads_pi_title')}</p>
+                <p className="text-xs text-muted-foreground">{t('social.ads_pi_desc', { amount: 5 })}</p>
               </div>
             </div>
             <button
@@ -132,7 +132,7 @@ export default function AdsPage() {
               disabled={showingPiAd}
               className="px-4 py-2 bg-accent text-accent-foreground rounded-md text-xs font-semibold hover:bg-accent/90 disabled:opacity-50 transition-colors"
             >
-              {showingPiAd ? 'Loading...' : 'Watch +5 ZP'}
+              {showingPiAd ? t('social.ads_pi_loading') : t('social.ads_pi_watch', { amount: 5 })}
             </button>
           </div>
         </div>
