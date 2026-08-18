@@ -227,8 +227,11 @@ export async function uploadToVercelBlob(file: File, folder: string = 'blog'): P
     const { put } = await import('@vercel/blob');
     const token = process.env.BLOB_READ_WRITE_TOKEN;
     if (!token) {
-      throw new Error('BLOB_READ_WRITE_TOKEN is not configured');
+      console.warn('[upload] attempted Vercel Blob upload but BLOB_READ_WRITE_TOKEN is NOT set in this runtime environment');
+      throw new Error('BLOB_READ_WRITE_TOKEN is not set in this runtime environment');
     }
+    // Masked token presence so function logs reveal the store without leaking it.
+    console.log('[upload] using Vercel Blob, token present, store id:', token.split('_')[2] ?? 'unknown');
 
     const filename = generateFilename(file.name);
     const pathname = `uploads/${folder}/${filename}`;
@@ -247,11 +250,11 @@ export async function uploadToVercelBlob(file: File, folder: string = 'blog'): P
       size: file.size,
       type: file.type,
     };
-  } catch (error) {
-    console.error('Vercel Blob upload error:', error);
+  } catch (error: any) {
+    console.error('Vercel Blob upload error:', error?.message || error);
     return {
       success: false,
-      error: 'Failed to upload image to Vercel Blob'
+      error: `Vercel Blob upload failed: ${error?.message || 'unknown error'}`,
     };
   }
 }

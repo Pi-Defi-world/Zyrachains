@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
     const config = getUploadConfig();
     console.log('Upload config:', {
       storage: config.storage,
+      hasBlobToken: !!(config.storage === 'vercel-blob' && config.vercelBlobToken),
       maxSize: config.maxSize,
       allowedTypes: config.allowedTypes
     });
