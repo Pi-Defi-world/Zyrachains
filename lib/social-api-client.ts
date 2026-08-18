@@ -1,10 +1,9 @@
-function resolveBaseUrl(): string {
-  const raw = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4111').trim();
-  if (/^https?:\/\//i.test(raw)) return raw.replace(/\/$/, '');
-  return `http://${raw.replace(/\/$/, '')}`;
-}
-
-const BASE = resolveBaseUrl();
+// All social calls are proxied through the same-origin Next.js route handler
+// (app/api/social/[...path]/route.ts), which forwards to the Express backend.
+// This avoids CORS and build-time-URL issues in production — the browser only
+// talks to this host. The Pi access token is attached so the backend's
+// authenticateUser middleware can resolve the user.
+const BASE = '';
 
 async function fetchAPI(endpoint: string, options: RequestInit = {}) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('pi_access_token') : null;
@@ -17,8 +16,13 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
       ...options.headers,
     },
   });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || data.message || `HTTP ${res.status}`);
+  let data: any = null;
+  try {
+    data = await res.json();
+  } catch {
+    /* non-JSON response */
+  }
+  if (!res.ok) throw new Error(data?.error || data?.message || `HTTP ${res.status}`);
   return data;
 }
 

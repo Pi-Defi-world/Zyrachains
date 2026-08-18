@@ -46,8 +46,10 @@ export class PiAdsService {
 
   static async verifyRewardedAd(adId: string, accessToken: string): Promise<boolean> {
     try {
-      const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-      const res = await fetch(`${base}/api/social/ads/verify`, {
+      // Same-origin proxy (app/api/social/[...path]/route.ts) → Express backend.
+      // The backend's Pi Ads /verify endpoint needs the Pi API key configured
+      // server-side (PI_NETWORK_API_KEY).
+      const res = await fetch('/api/social/ads/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
         body: JSON.stringify({ adId }),

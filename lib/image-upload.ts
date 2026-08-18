@@ -12,7 +12,7 @@ export interface UploadResult {
 export interface UploadConfig {
   maxSize: number;
   allowedTypes: string[];
-  storage: 'local' | 'cloudinary' | 'aws-s3';
+  storage: 'local' | 'cloudinary' | 'aws-s3' | 'vercel-blob';
   cloudinaryConfig?: {
     cloudName: string;
     apiKey: string;
@@ -24,6 +24,7 @@ export interface UploadConfig {
     region: string;
     bucket: string;
   };
+  vercelBlobToken?: string;
 }
 
 // Default configuration
@@ -220,6 +221,41 @@ export async function uploadToS3(file: File, config: UploadConfig): Promise<Uplo
   }
 }
 
+// Vercel Blob upload (production default — the local filesystem is read-only on Vercel)
+export async function uploadToVercelBlob(file: File, folder: string = 'blog'): Promise<UploadResult> {
+  try {
+    const { put } = await import('@vercel/blob');
+    const token = process.env.BLOB_READ_WRITE_TOKEN;
+    if (!token) {
+      throw new Error('BLOB_READ_WRITE_TOKEN is not configured');
+    }
+
+    const filename = generateFilename(file.name);
+    const pathname = `uploads/${folder}/${filename}`;
+
+    const result = await put(pathname, file, {
+      access: 'public',
+      token,
+      contentType: file.type,
+      addRandomSuffix: false,
+    });
+
+    return {
+      success: true,
+      url: result.url,
+      filename: result.pathname,
+      size: file.size,
+      type: file.type,
+    };
+  } catch (error) {
+    console.error('Vercel Blob upload error:', error);
+    return {
+      success: false,
+      error: 'Failed to upload image to Vercel Blob'
+    };
+  }
+}
+
 // Main upload function
 export async function uploadImage(file: File, config: UploadConfig = defaultConfig, request?: Request): Promise<UploadResult> {
   // Validate file first
@@ -239,6 +275,8 @@ export async function uploadImage(file: File, config: UploadConfig = defaultConf
       return await uploadToCloudinary(file, config);
     case 'aws-s3':
       return await uploadToS3(file, config);
+    case 'vercel-blob':
+      return await uploadToVercelBlob(file, 'blog');
     default:
       return {
         success: false,
@@ -249,8 +287,14 @@ export async function uploadImage(file: File, config: UploadConfig = defaultConf
 
 // Helper function to get upload configuration from environment
 export function getUploadConfig(): UploadConfig {
-  const storage = (process.env.IMAGE_STORAGE as 'local' | 'cloudinary' | 'aws-s3') || 'local';
-  
+  const configuredStorage = process.env.IMAGE_STORAGE as 'local' | 'cloudinary' | 'aws-s3' | 'vercel-blob' | undefined;
+  const hasBlobToken = !!process.env.BLOB_READ_WRITE_TOKEN;
+
+  // If no explicit storage is set but a Vercel Blob token exists (e.g. in Vercel
+  // production), prefer Blob — the local filesystem is read-only on Vercel.
+  const storage: UploadConfig['storage'] =
+    configuredStorage || (hasBlobToken ? 'vercel-blob' : 'local');
+
   const config: UploadConfig = {
     maxSize: parseInt(process.env.MAX_FILE_SIZE || '5242880'), // 5MB default
     allowedTypes: (process.env.ALLOWED_IMAGE_TYPES || 'image/jpeg,image/jpg,image/png,image/gif,image/webp').split(','),
@@ -272,6 +316,10 @@ export function getUploadConfig(): UploadConfig {
       region: process.env.AWS_REGION!,
       bucket: process.env.AWS_S3_BUCKET!
     };
+  }
+
+  if (storage === 'vercel-blob') {
+    config.vercelBlobToken = process.env.BLOB_READ_WRITE_TOKEN;
   }
 
   return config;
