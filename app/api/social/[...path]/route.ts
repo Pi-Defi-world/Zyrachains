@@ -23,10 +23,15 @@ async function proxy(request: NextRequest, context: RouteContext) {
     const auth = request.headers.get('authorization');
     if (auth) headers['Authorization'] = auth;
 
-    // Read body as text and pass it through verbatim (JSON requests).
-    const body = request.headers.get('content-type')?.includes('application/json')
-      ? await request.text()
-      : undefined;
+    // Read body as text and pass it through verbatim (JSON requests). GET/HEAD
+    // requests never carry a body — passing one throws "Request with GET/HEAD
+    // method cannot have body.".
+    const wantsJson = request.headers.get('content-type')?.includes('application/json');
+    const rawBody =
+      wantsJson && request.method !== 'GET' && request.method !== 'HEAD'
+        ? await request.text()
+        : undefined;
+    const body = rawBody && rawBody.length > 0 ? rawBody : undefined;
 
     const res = await fetch(`${SERVER_URL}/api/social/${suffix}${search}`, {
       method: request.method,
