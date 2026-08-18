@@ -31,3 +31,6 @@ backup-sensitive-data
 backup-migration
 /scripts
 frontend-local.log
+
+# runtime uploads
+/public/uploads
