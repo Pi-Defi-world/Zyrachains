@@ -292,11 +292,15 @@ export async function uploadImage(file: File, config: UploadConfig = defaultConf
 export function getUploadConfig(): UploadConfig {
   const configuredStorage = process.env.IMAGE_STORAGE as 'local' | 'cloudinary' | 'aws-s3' | 'vercel-blob' | undefined;
   const hasBlobToken = !!process.env.BLOB_READ_WRITE_TOKEN;
+  const isVercel = process.env.VERCEL === '1';
 
   // If no explicit storage is set but a Vercel Blob token exists (e.g. in Vercel
   // production), prefer Blob — the local filesystem is read-only on Vercel.
+  // If we're on Vercel but the token is missing, still route to Blob so the
+  // failure is explicit ("BLOB_READ_WRITE_TOKEN is not set…") instead of a
+  // confusing local-storage error on a read-only filesystem.
   const storage: UploadConfig['storage'] =
-    configuredStorage || (hasBlobToken ? 'vercel-blob' : 'local');
+    configuredStorage || (hasBlobToken || isVercel ? 'vercel-blob' : 'local');
 
   const config: UploadConfig = {
     maxSize: parseInt(process.env.MAX_FILE_SIZE || '5242880'), // 5MB default
