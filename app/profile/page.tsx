@@ -1,10 +1,15 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/languagecontext';
 import { usePageMetadata } from '@/context/pagemetadataContext';
 import { usePiNetwork } from '@/context/PiNetworkContext';
+import { useSocial } from '@/context/SocialContext';
+import { socialAPI } from '@/lib/social-api-client';
 import DonationModal from '@/components/DonationModal';
+import BadgeDisplay from '@/components/social/BadgeDisplay';
+import Avatar from '@/components/social/Avatar';
+import ReferralCard from '@/components/social/ReferralCard';
 import {
   Plug,
   Settings,
@@ -29,23 +34,108 @@ import {
   Droplets,
   TrendingUp,
   Compass,
-  Heart
+  Heart,
+  Video,
+  Shield,
+  History,
+  Award,
+  Camera,
+  X,
+  Save
 } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
   const { t } = useLanguage();
   const { setHeading, setTitle, setDescription } = usePageMetadata();
   const { user, isAuthenticated, logout, authenticate, isLoading } = usePiNetwork();
+  const { tokenBalance, gameStats } = useSocial();
   const [showComingSoonModal, setShowComingSoonModal] = useState(false);
   const [showListingsDropdown, setShowListingsDropdown] = useState(false);
   const [showExplorerDropdown, setShowExplorerDropdown] = useState(false);
   const [showDonationModal, setShowDonationModal] = useState(false);
+  const [profileStats, setProfileStats] = useState<any>(null);
+  const [myBadges, setMyBadges] = useState<any[]>([]);
+  const [showEditProfile, setShowEditProfile] = useState(false);
+  const [bioInput, setBioInput] = useState('');
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileError, setProfileError] = useState('');
+  const [profileSaved, setProfileSaved] = useState(false);
+
+  const loadDashboard = useCallback(async () => {
+    if (!isAuthenticated || !user?.uid) return;
+    try {
+      const [profileRes, badgesRes] = await Promise.all([
+        socialAPI.getProfile(user.uid).catch(() => null),
+        socialAPI.getUserBadges(user.uid).catch(() => null),
+      ]);
+      setProfileStats(profileRes?.data || null);
+      setMyBadges(badgesRes?.data || []);
+    } catch (err) {
+      console.error('Failed to load profile dashboard:', err);
+    }
+  }, [isAuthenticated, user?.uid]);
 
   React.useEffect(() => {
     setHeading('Profile');
     setTitle('Profile - Zyrachain');
     setDescription('Manage your profile and account settings');
   }, [setHeading, setTitle, setDescription]);
+
+  useEffect(() => {
+    loadDashboard();
+  }, [loadDashboard]);
+
+  const openEditProfile = () => {
+    setBioInput(profileStats?.bio ?? '');
+    setAvatarPreview(profileStats?.avatar ?? null);
+    setProfileError('');
+    setProfileSaved(false);
+    setShowEditProfile(true);
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('type', 'avatar');
+
+    try {
+      const res = await fetch('/api/upload/image', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setProfileError(data.error || 'Failed to upload image');
+        return;
+      }
+      setAvatarPreview(data.url);
+    } catch (err) {
+      setProfileError('Failed to upload image');
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    setSavingProfile(true);
+    setProfileError('');
+    setProfileSaved(false);
+    try {
+      await socialAPI.updateProfile({
+        avatar: avatarPreview,
+        bio: bioInput,
+      });
+      setProfileSaved(true);
+      await loadDashboard();
+      setTimeout(() => setShowEditProfile(false), 800);
+    } catch (err: any) {
+      setProfileError(err.message || 'Failed to update profile');
+    } finally {
+      setSavingProfile(false);
+    }
+  };
 
   const handleCopyPCMID = () => {
     navigator.clipboard.writeText('3326364256');
@@ -106,6 +196,34 @@ const ProfilePage: React.FC = () => {
   ];
 
   const profileMenuItems = [   
+    {
+      title: 'Trx History',
+      description: 'Your ZP token transactions',
+      icon: History,
+      href: '/social/tokens',
+      showChevron: true
+    },
+    {
+      title: 'Badges',
+      description: 'View and earn profile badges',
+      icon: Award,
+      href: '/social/badges',
+      showChevron: true
+    },
+    {
+      title: 'Earn ZP',
+      description: 'Watch ads to earn Zyra Points',
+      icon: Video,
+      href: '/social/ads',
+      showChevron: true
+    },
+    {
+      title: 'Moderate',
+      description: 'Review flagged content as a moderator',
+      icon: Shield,
+      href: '/social/moderation',
+      showChevron: true
+    },
     {
       title: 'Hackathons',
       description: '',
@@ -176,14 +294,14 @@ const ProfilePage: React.FC = () => {
       href: '/contactUs',
       showChevron: true
     },
-    {
+       {
       title: isAuthenticated ? 'Disconnect Pi Wallet' : 'Connect Pi Wallet',
       description: isAuthenticated ? 'Logout from your Pi account' : 'Connect to access exclusive features',
       icon: isAuthenticated ? LogOut : Plug,
       onClick: isAuthenticated ? logout : () => authenticate().catch(() => setShowComingSoonModal(true)),
       showChevron: false,
       disabled: isLoading
-    },
+    }
   ];
 
   return (
@@ -197,13 +315,29 @@ const ProfilePage: React.FC = () => {
         <div className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 shadow-sm border border-border/50">
           <div className="flex items-center space-x-3 sm:space-x-4">
             {/* Avatar */}
-            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 text-white animate-spin" />
-              ) : (
-                <span className="text-white text-lg sm:text-xl font-bold">
-                  {isAuthenticated && user?.username ? user.username.slice(0, 2).toUpperCase() : '👤'}
-                </span>
+            <div className="relative">
+              <div className="w-12 h-12 sm:w-16 sm:h-16">
+                {isLoading ? (
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
+                    <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 text-white animate-spin" />
+                  </div>
+                ) : (
+                  <Avatar
+                    src={profileStats?.avatar ?? null}
+                    name={isAuthenticated ? user?.username ?? null : null}
+                    size="lg"
+                    className="w-12 h-12 sm:w-16 sm:h-16"
+                  />
+                )}
+              </div>
+              {isAuthenticated && !isLoading && (
+                <button
+                  onClick={openEditProfile}
+                  className="absolute -bottom-1 -right-1 h-6 w-6 sm:h-7 sm:w-7 rounded-full bg-primary text-primary-foreground border-2 border-card flex items-center justify-center hover:bg-primary/90 transition-colors"
+                  aria-label="Edit profile"
+                >
+                  <Camera className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                </button>
               )}
             </div>
             
@@ -214,7 +348,15 @@ const ProfilePage: React.FC = () => {
                   ? 'Authenticating...'
                   : isAuthenticated && user?.username 
                     ? `@${user.username}` 
-                    : 'Connect Pi Wallet'
+                    : (
+                      <button
+                        onClick={() => authenticate().catch(() => setShowComingSoonModal(true))}
+                        className="text-base sm:text-lg font-semibold text-foreground hover:underline flex items-center gap-2"
+                      >
+                        <Plug className="h-4 w-4 text-primary flex-shrink-0" />
+                        Connect Pi Wallet
+                      </button>
+                    )
                 }
               </div>
               {isAuthenticated && user?.wallet_address && !isLoading ? (
@@ -229,9 +371,69 @@ const ProfilePage: React.FC = () => {
                   </button>
                 </div>
               ) : null}
+              {isAuthenticated && profileStats?.bio && !isLoading ? (
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1 line-clamp-2">
+                  {profileStats.bio}
+                </p>
+              ) : null}
             </div>
           </div>
         </div>
+
+        {/* Dashboard Stats */}
+        {isAuthenticated && (
+          <div className="mb-4 sm:mb-6 grid grid-cols-2 gap-2 sm:gap-3">
+            <div className="bg-card rounded-xl border border-border/40 p-3 sm:p-4 text-center">
+              <p className="text-[10px] text-muted-foreground">ZP Balance</p>
+              <p className="text-lg font-bold text-accent mt-0.5">
+                {tokenBalance?.balance?.toFixed(2) ?? (profileStats?.balance ?? 0).toFixed(2)}
+              </p>
+            </div>
+            <div className="bg-card rounded-xl border border-border/40 p-3 sm:p-4 text-center">
+              <p className="text-[10px] text-muted-foreground">Level</p>
+              <p className="text-lg font-bold text-foreground mt-0.5">
+                {gameStats?.level ?? profileStats?.level ?? 1}
+              </p>
+            </div>
+            <div className="bg-card rounded-xl border border-border/40 p-3 sm:p-4 text-center">
+              <p className="text-[10px] text-muted-foreground">XP</p>
+              <p className="text-lg font-bold text-foreground mt-0.5">
+                {(gameStats?.xp ?? profileStats?.xp ?? 0).toLocaleString()}
+              </p>
+            </div>
+            <div className="bg-card rounded-xl border border-border/40 p-3 sm:p-4 text-center">
+              <p className="text-[10px] text-muted-foreground">Followers</p>
+              <p className="text-lg font-bold text-foreground mt-0.5">
+                {profileStats?.follower_count ?? 0}
+              </p>
+            </div>
+            <div className="bg-card rounded-xl border border-border/40 p-3 sm:p-4 text-center">
+              <p className="text-[10px] text-muted-foreground">Following</p>
+              <p className="text-lg font-bold text-foreground mt-0.5">
+                {profileStats?.following_count ?? 0}
+              </p>
+            </div>
+            <div className="bg-card rounded-xl border border-border/40 p-3 sm:p-4 text-center">
+              <p className="text-[10px] text-muted-foreground">Posts</p>
+              <p className="text-lg font-bold text-foreground mt-0.5">
+                {profileStats?.post_count ?? 0}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* My Badges */}
+        {isAuthenticated && myBadges.length > 0 && (
+          <div className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 shadow-sm border border-border/40">
+            <h2 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-1.5">
+              <Award className="w-4 h-4 text-primary" /> My Badges
+            </h2>
+            <BadgeDisplay badges={myBadges} max={10} />
+          </div>
+        )}
+
+        {/* Referrals */}
+        {isAuthenticated && <ReferralCard />}
 
         {/* Menu Items */}
         <div className="space-y-2 sm:space-y-3">
@@ -408,6 +610,77 @@ const ProfilePage: React.FC = () => {
                 Got it!
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Profile Modal */}
+      {showEditProfile && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-card rounded-xl p-6 sm:p-8 max-w-sm w-full mx-4 shadow-xl text-center relative">
+            <button
+              className="absolute top-3 right-3 sm:top-4 sm:right-4 text-muted-foreground hover:text-foreground p-1"
+              onClick={() => setShowEditProfile(false)}
+              aria-label="Close"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            <h2 className="text-lg sm:text-xl font-bold mb-4">Edit Profile</h2>
+
+            {/* Avatar preview + upload */}
+            <div className="flex flex-col items-center mb-4">
+              <Avatar
+                src={avatarPreview}
+                name={isAuthenticated ? user?.username ?? null : null}
+                size="xl"
+              />
+              <label className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted/70 transition-colors cursor-pointer text-sm font-medium">
+                <Camera className="h-4 w-4" />
+                {avatarPreview ? 'Change Avatar' : 'Upload Avatar'}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  className="hidden"
+                  onChange={handleAvatarUpload}
+                />
+              </label>
+            </div>
+
+            {/* Bio */}
+            <div className="text-left mb-4">
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">
+                Bio ({bioInput.length}/500)
+              </label>
+              <textarea
+                value={bioInput}
+                onChange={(e) => setBioInput(e.target.value)}
+                maxLength={500}
+                rows={3}
+                className="w-full px-3 py-2 bg-muted rounded-lg border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                placeholder="Tell people about yourself..."
+              />
+            </div>
+
+            {profileError && (
+              <p className="text-sm text-red-500 mb-3">{profileError}</p>
+            )}
+            {profileSaved && (
+              <p className="text-sm text-emerald-500 mb-3">Profile updated successfully!</p>
+            )}
+
+            <button
+              onClick={handleSaveProfile}
+              disabled={savingProfile}
+              className="w-full px-4 py-2.5 sm:py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium text-sm sm:text-base disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {savingProfile ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              Save Profile
+            </button>
           </div>
         </div>
       )}

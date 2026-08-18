@@ -104,8 +104,9 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
           if (typeof window !== 'undefined' && (window as any).Pi) {
             try {
               const isDev = process.env.NODE_ENV === 'development';
-              await (window as any).Pi.init({ version: "2.0", sandbox: isDev });
-              console.log('✅ Pi SDK re-initialized for existing auth');
+              const useSandbox = process.env.NEXT_PUBLIC_PI_SANDBOX === 'true' || isDev;
+              await (window as any).Pi.init({ version: "2.0", sandbox: useSandbox });
+              console.log('✅ Pi SDK re-initialized for existing auth (sandbox:', useSandbox, ')');
             } catch (initError) {
               console.warn('⚠️ Pi SDK re-init failed:', initError);
             }
@@ -165,8 +166,9 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
       console.log('🔐 Starting authentication flow...');
 
       const isDev = process.env.NODE_ENV === 'development';
-      console.log('📦 Initializing Pi SDK (sandbox:', isDev, ')');
-      await (window as any).Pi.init({ version: "2.0", sandbox: isDev });
+      const useSandbox = process.env.NEXT_PUBLIC_PI_SANDBOX === 'true' || isDev;
+      console.log('📦 Initializing Pi SDK (sandbox:', useSandbox, ')');
+      await (window as any).Pi.init({ version: "2.0", sandbox: useSandbox });
 
       const onIncompletePaymentFound = async (payment: any) => {
         console.log('⚠️ Incomplete payment found:', payment);
@@ -279,7 +281,8 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
       throw new Error('Pi SDK not available. Please open in Pi Browser.');
     }
     const isDev = process.env.NODE_ENV === 'development';
-    await (window as any).Pi.init({ version: "2.0", sandbox: isDev });
+    const useSandbox = process.env.NEXT_PUBLIC_PI_SANDBOX === 'true' || isDev;
+    await (window as any).Pi.init({ version: "2.0", sandbox: useSandbox });
 
     const auth = await (window as any).Pi.authenticate(
       ["username", "payments", "wallet_address"],

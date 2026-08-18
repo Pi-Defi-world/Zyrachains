@@ -1,66 +1,38 @@
-import { NextRequest, NextResponse } from 'next/server';
-import connectToDatabase from '@/lib/mongodb';
+import { NextRequest } from 'next/server';
+import { fetchBackend, proxyJson } from '@/lib/backend-proxy';
+
+const LISTING_TYPES = ['business', 'startup', 'community', 'influencer', 'project'];
 
 export async function GET(request: NextRequest) {
   try {
-    await connectToDatabase();
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');
-    
-    let data = [];
-    
-    if (type === 'business') {
-      // Fetch from businesslistings collection
-      const mongoose = await connectToDatabase();
-      const collection = mongoose.connection.db.collection('businesslistings');
-      data = await collection.find({}).sort({ createdAt: -1 }).limit(50).toArray();
-    } else if (type === 'startup') {
-      // Fetch from startuplistings collection
-      const mongoose = await connectToDatabase();
-      const collection = mongoose.connection.db.collection('startuplistings');
-      data = await collection.find({}).sort({ createdAt: -1 }).limit(50).toArray();
-    } else if (type === 'project') {
-      // Fetch from projectlistings collection
-      const mongoose = await connectToDatabase();
-      const collection = mongoose.connection.db.collection('projectlistings');
-      data = await collection.find({}).sort({ createdAt: -1 }).limit(50).toArray();
-    } else if (type === 'influencer') {
-      // Fetch from influencerlistings collection
-      const mongoose = await connectToDatabase();
-      const collection = mongoose.connection.db.collection('influencerlistings');
-      data = await collection.find({}).sort({ createdAt: -1 }).limit(50).toArray();
-    } else {
-      // Return all listings if no type specified
-      const mongoose = await connectToDatabase();
-      const [business, startup, project, influencer] = await Promise.all([
-        mongoose.connection.db.collection('businesslistings').find({}).sort({ createdAt: -1 }).limit(20).toArray(),
-        mongoose.connection.db.collection('startuplistings').find({}).sort({ createdAt: -1 }).limit(20).toArray(),
-        mongoose.connection.db.collection('projectlistings').find({}).sort({ createdAt: -1 }).limit(20).toArray(),
-        mongoose.connection.db.collection('influencerlistings').find({}).sort({ createdAt: -1 }).limit(20).toArray()
-      ]);
-      
-      return NextResponse.json({
-        success: true,
-        business,
-        startup,
-        project,
-        influencer
-      });
+
+    if (type && LISTING_TYPES.includes(type)) {
+      const { status, data } = await fetchBackend('GET', `/api/listings/${type}`);
+      const listings = data.listings ?? data.projects ?? [];
+      return proxyJson({ success: true, data: listings }, status);
     }
-    
-    return NextResponse.json({
+
+    // Legacy: no type specified — aggregate all listings
+    const { status, data } = await fetchBackend('GET', '/api/listings/all');
+    const l = data.listings || {};
+    return proxyJson({
       success: true,
-      data
-    });
+      business: l.business || [],
+      startup: l.startup || [],
+      project: [],
+      influencer: l.influencer || [],
+    }, status);
   } catch (error) {
     console.error('Error fetching listings data:', error);
-    return NextResponse.json(
-      { 
+    return proxyJson(
+      {
         success: false,
         error: 'Failed to fetch listings data',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      500
     );
   }
 }
@@ -68,44 +40,28 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const mongoose = await connectToDatabase();
-    
-    let collection;
-    
-    if (body.type === 'business') {
-      collection = mongoose.connection.db.collection('businesslistings');
-    } else if (body.type === 'startup') {
-      collection = mongoose.connection.db.collection('startuplistings');
-    } else if (body.type === 'project') {
-      collection = mongoose.connection.db.collection('projectlistings');
-    } else if (body.type === 'influencer') {
-      collection = mongoose.connection.db.collection('influencerlistings');
-    } else {
-      return NextResponse.json(
-        { success: false, error: 'Invalid listing type specified' },
-        { status: 400 }
-      );
+    const type = body.type;
+
+    if (!type || !LISTING_TYPES.includes(type)) {
+      return proxyJson({ success: false, error: 'Invalid listing type specified' }, 400);
     }
-    
-    const result = await collection.insertOne({
-      ...body,
-      createdAt: new Date(),
-      updatedAt: new Date()
+
+    const { type: _type, ...listingData } = body;
+    const { status, data } = await fetchBackend('POST', `/api/listings/${type}`, {
+      body: listingData,
     });
-    
-    return NextResponse.json({
-      success: true,
-      data: { id: result.insertedId, ...body }
-    }, { status: 201 });
+
+    const listing = data.listing ?? data.project ?? data.listing;
+    return proxyJson({ success: true, data: { id: listing?._id, ...body } }, status || 201);
   } catch (error) {
     console.error('Error creating listing:', error);
-    return NextResponse.json(
-      { 
+    return proxyJson(
+      {
         success: false,
         error: 'Failed to create listing',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      500
     );
   }
-} 
+}

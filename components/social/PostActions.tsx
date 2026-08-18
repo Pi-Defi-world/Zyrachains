@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Heart, MessageCircle, Repeat2, TrendingUp, DollarSign } from 'lucide-react';
+import { Heart, MessageCircle, Repeat2, TrendingUp, DollarSign, Share2 } from 'lucide-react';
 import { useSocial } from '@/context/SocialContext';
 import { useLanguage } from '@/context/languagecontext';
 import { useToast } from '@/components/context/ToastContext';
@@ -36,6 +36,16 @@ export default function PostActions({ post, detail = false }: PostActionsProps) 
     setTimeout(() => setAnimating(null), 600);
   };
 
+  const handleShare = async () => {
+    const url = `${window.location.origin}/social/post/${post._id}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast('Post link copied to clipboard', 'success');
+    } catch (err) {
+      showToast('Could not copy link', 'error');
+    }
+  };
+
   return (
     <>
       <div className="flex items-center gap-3 sm:gap-4 mt-3 pt-3 border-t border-border">
@@ -52,6 +62,11 @@ export default function PostActions({ post, detail = false }: PostActionsProps) 
         <button onClick={handleReshare} className={`inline-flex items-center gap-1 text-xs sm:text-sm transition-all ${animating === 'reshare' ? 'scale-125 text-green-500' : 'text-muted-foreground hover:text-green-500'}`}>
           <Repeat2 className="w-4 h-4" />
           <span className="font-medium">{post.reshare_count || 0}</span>
+        </button>
+
+        <button onClick={handleShare} className="inline-flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-blue-500 transition-colors">
+          <Share2 className="w-4 h-4" />
+          <span className="hidden sm:inline">{t('social.share')}</span>
         </button>
 
         <button onClick={() => setShowTip(true)} className="inline-flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-yellow-600 transition-colors">

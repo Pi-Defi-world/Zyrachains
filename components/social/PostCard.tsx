@@ -4,7 +4,10 @@ import React from 'react';
 import Link from 'next/link';
 import { Heart, MessageCircle, Repeat2, TrendingUp, Eye } from 'lucide-react';
 import { useLanguage } from '@/context/languagecontext';
+import { usePiNetwork } from '@/context/PiNetworkContext';
 import PostActions from './PostActions';
+import FollowButton from './FollowButton';
+import Avatar from './Avatar';
 
 interface PostCardProps {
   post: any;
@@ -27,20 +30,21 @@ function timeAgo(dateStr: string): string {
 
 export default function PostCard({ post, detail = false }: PostCardProps) {
   const { t } = useLanguage();
+  const { user } = usePiNetwork();
+  const isOwnPost = user?.uid === post.author_uid;
+  const displayName = post.author_username || post.author_uid?.slice(0, 8) || 'User';
 
   return (
-    <div className="card-elevated p-4 mb-3">
+    <div className="card-elevated p-4 mb-3 relative">
       <div className="flex items-start gap-3">
-        <div className="w-9 h-9 rounded-full bg-accent flex items-center justify-center text-accent-foreground font-bold text-xs shrink-0">
-          {post.author_uid?.slice(0, 1).toUpperCase() || 'U'}
-        </div>
+        <Avatar src={post.author_avatar} name={displayName} size="md" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <Link
               href={`/social/profile/${post.author_uid}`}
               className="font-semibold text-foreground hover:text-accent text-sm"
             >
-              {post.author_uid?.slice(0, 8)}...
+              {displayName}
             </Link>
             {post.is_boosted && (
               <span className="text-[10px] bg-accent text-accent-foreground px-1.5 py-0.5 rounded-full font-medium inline-flex items-center gap-1">
@@ -54,6 +58,15 @@ export default function PostCard({ post, detail = false }: PostCardProps) {
               <Eye className="w-3 h-3" /> {t('social.impressions', { count: post.impression_count || 0 })}
             </span>
           </div>
+
+          {!isOwnPost && post.author_uid && (
+            <div className="absolute top-4 right-4">
+              <FollowButton
+                targetUID={post.author_uid}
+                isFollowing={!!post.viewer_following}
+              />
+            </div>
+          )}
 
           <Link href={`/social/post/${post._id}`} className="block mt-1">
             <p className={`text-sm text-foreground/85 whitespace-pre-wrap break-words ${detail ? '' : 'line-clamp-5'}`}>

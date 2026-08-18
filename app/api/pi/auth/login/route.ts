@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    const response = await fetch(`${SERVER_URL}/api/pi/auth/login`, {
+    const response = await fetch(`${SERVER_URL}/api/pi/auth/verify`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

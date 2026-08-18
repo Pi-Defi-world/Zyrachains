@@ -1,6 +1,5 @@
 function resolveBaseUrl(): string {
-  if (typeof window !== 'undefined') return '';
-  const raw = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000').trim();
+  const raw = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4111').trim();
   if (/^https?:\/\//i.test(raw)) return raw.replace(/\/$/, '');
   return `http://${raw.replace(/\/$/, '')}`;
 }
@@ -70,6 +69,13 @@ export const socialAPI = {
 
   // Users
   getProfile: (uid: string) => fetchAPI(`/api/social/users/${uid}/profile`),
+  updateProfile: (data: { avatar?: string | null; bio?: string | null }) =>
+    fetchAPI('/api/social/users/me/profile', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+  getUserPosts: (uid: string, page = 1, limit = 20) =>
+    fetchAPI(`/api/social/users/${uid}/posts?page=${page}&limit=${limit}`),
   followUser: (uid: string) => fetchAPI(`/api/social/users/${uid}/follow`, { method: 'POST' }),
   unfollowUser: (uid: string) => fetchAPI(`/api/social/users/${uid}/follow`, { method: 'DELETE' }),
   getFollowers: (uid: string, page = 1, limit = 20) =>
@@ -111,4 +117,12 @@ export const socialAPI = {
   getLeaderboard: (page = 1, limit = 100) =>
     fetchAPI(`/api/social/gamification/leaderboard?page=${page}&limit=${limit}`),
   getStreak: () => fetchAPI('/api/social/gamification/streak'),
+
+  // Referrals
+  applyReferral: (code: string) =>
+    fetchAPI('/api/social/referrals/apply', {
+      method: 'POST',
+      body: JSON.stringify({ code }),
+    }),
+  getReferralStats: () => fetchAPI('/api/social/referrals/stats'),
 };

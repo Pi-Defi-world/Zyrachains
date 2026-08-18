@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const PI_API_BASE = process.env.NEXT_PUBLIC_PI_SANDBOX === 'true'
+  ? 'https://api.testnet.minepi.com'
+  : 'https://api.minepi.com';
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -17,7 +21,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Exchange code for access token
-    const tokenResponse = await fetch('https://api.minepi.com/oauth/token', {
+    const tokenResponse = await fetch(`${PI_API_BASE}/oauth/token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',

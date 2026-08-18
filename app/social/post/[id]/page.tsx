@@ -105,9 +105,9 @@ export default function PostDetailPage() {
               <div key={comment._id} className="bg-card border border-border rounded-lg p-3">
                 <div className="flex items-center gap-2 mb-1">
                   <div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center text-accent-foreground font-bold text-[10px]">
-                    {comment.author_uid?.slice(0, 1).toUpperCase()}
+                    {(comment.author_username || comment.author_uid)?.slice(0, 1).toUpperCase()}
                   </div>
-                  <span className="text-xs font-medium text-foreground">{comment.author_uid?.slice(0, 8)}...</span>
+                  <span className="text-xs font-medium text-foreground">{comment.author_username || comment.author_uid?.slice(0, 8)}</span>
                   <span className="text-[10px] text-muted-foreground">{new Date(comment.createdAt).toLocaleDateString()}</span>
                 </div>
                 <p className="text-sm text-foreground/85 ml-8">{comment.content}</p>

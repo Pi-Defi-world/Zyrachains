@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Flame, Trophy, Award, DollarSign, Video, Shield } from 'lucide-react';
+import { Award, Coins, Megaphone, ShieldAlert, Trophy, User } from 'lucide-react';
 import { useLanguage } from '@/context/languagecontext';
 
 export default function SocialNav() {
@@ -11,13 +11,11 @@ export default function SocialNav() {
   const { t } = useLanguage();
 
   const navItems = [
-    { href: '/social', label: String(t('social.hub')), icon: Home },
-    { href: '/social/feed', label: String(t('social.feed')), icon: Flame },
-    { href: '/social/leaderboard', label: String(t('social.leaderboard')), icon: Trophy },
     { href: '/social/badges', label: String(t('social.badges')), icon: Award },
-    { href: '/social/tokens', label: String(t('social.tokens')), icon: DollarSign },
-    { href: '/social/ads', label: String(t('social.earn')), icon: Video },
-    { href: '/social/moderation', label: String(t('social.moderate')), icon: Shield },
+    { href: '/social/tokens', label: String(t('social.tokens')), icon: Coins },
+    { href: '/social/ads', label: String(t('social.ads_title')), icon: Megaphone },
+    { href: '/social/moderation', label: String(t('social.moderate_title')), icon: ShieldAlert },
+    { href: '/social/leaderboard', label: String(t('social.leaderboard_title')), icon: Trophy },
   ];
 
   return (
@@ -35,7 +33,7 @@ export default function SocialNav() {
                 : 'text-muted-foreground hover:text-foreground hover:bg-secondary/40'
             }`}
           >
-            <span className="w-1 h-1 rounded-full bg-current opacity-40 flex-shrink-0" />
+            <Icon className="w-3.5 h-3.5" />
             {item.label}
           </Link>
         );

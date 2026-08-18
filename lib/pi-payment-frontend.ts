@@ -63,10 +63,13 @@ export class PiListingPaymentService {
 
     try {
       const isDev = typeof process !== 'undefined' && process.env.NODE_ENV === 'development';
-      console.log('🔧 Initializing Pi SDK (sandbox:', isDev, ')');
+      const useSandbox = typeof process !== 'undefined'
+        ? (process.env.NEXT_PUBLIC_PI_SANDBOX === 'true' || isDev)
+        : true;
+      console.log('🔧 Initializing Pi SDK (sandbox:', useSandbox, ')');
       await window.Pi.init({
         version: "2.0",
-        sandbox: isDev
+        sandbox: useSandbox
       });
       
       this.isInitialized = true;

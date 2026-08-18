@@ -1,41 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getPiNetworkBackendService } from '../../../../../lib/pi-network';
-import connectToDatabase from '../../../../../lib/mongodb';
+import { NextRequest } from 'next/server';
+import { fetchBackend, proxyJson } from '@/lib/backend-proxy';
 
 export async function POST(request: NextRequest) {
   try {
-    const { paymentId } = await request.json();
+    const body = await request.json();
+    const { paymentId } = body;
 
     if (!paymentId) {
-      return NextResponse.json(
-        { error: 'Payment ID is required' },
-        { status: 400 }
-      );
+      return proxyJson({ error: 'Payment ID is required' }, 400);
     }
 
-    // Get Pi Network backend service
-    const piService = getPiNetworkBackendService();
-
-    // Approve the payment on Pi Network
-    await piService.approvePayment(paymentId);
-
-    console.log(`Payment ${paymentId} approved successfully`);
-
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Payment approved successfully',
-      paymentId 
+    const { status, data } = await fetchBackend('POST', '/api/pi/payments/approve', {
+      body,
     });
 
+    return proxyJson(data, status);
   } catch (error) {
     console.error('Error approving payment:', error);
-    
-    return NextResponse.json(
-      { 
+    return proxyJson(
+      {
         error: 'Failed to approve payment',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      500
     );
   }
 }

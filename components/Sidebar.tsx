@@ -60,10 +60,7 @@ const navGroups: NavGroup[] = [
   {
     label: 'Social', icon: <MessageSquare className="h-4 w-4" />,
     links: [
-      { href: '/social', label: 'Feed' },
-      { href: '/social/leaderboard', label: 'Leaderboard' },
-      { href: '/social/ads', label: 'Earn ZP' },
-      { href: '/social/badges', label: 'Badges' },
+      { href: '/social', label: 'Social' },
     ],
   },
   {
@@ -71,6 +68,7 @@ const navGroups: NavGroup[] = [
     links: [
       { href: '/profile', label: 'Profile' },
       { href: '/contactUs', label: 'Contact' },
+      { href: '/faq', label: 'FAQ' },
     ],
   },
 ];
@@ -79,7 +77,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const [expanded, setExpanded] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [position, setPosition] = useState(() => ({ x: 16, y: typeof window !== 'undefined' ? window.innerHeight - 80 : 600 }));
+  const [position, setPosition] = useState(() => ({ x: 16, y: 600 }));
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const dragRef = useRef<HTMLButtonElement>(null);
@@ -96,6 +94,8 @@ export function Sidebar() {
           setPosition(parsed);
         }
       } catch { /* use default */ }
+    } else {
+      setPosition((prev) => ({ x: prev.x, y: window.innerHeight - 80 }));
     }
   }, []);
 

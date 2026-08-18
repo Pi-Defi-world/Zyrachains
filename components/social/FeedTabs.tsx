@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Flame, Clock, Users } from 'lucide-react';
+import { Flame, Clock, Users, Trophy } from 'lucide-react';
 import { useSocial } from '@/context/SocialContext';
 import { useLanguage } from '@/context/languagecontext';
 
@@ -9,6 +9,7 @@ const tabs = [
   { key: 'trending', label: 'social.trending', icon: Flame },
   { key: 'following', label: 'social.following', icon: Users },
   { key: 'new', label: 'social.new', icon: Clock },
+  { key: 'leaderboard', label: 'social.leaderboard', icon: Trophy },
 ];
 
 export default function FeedTabs() {

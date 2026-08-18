@@ -3,7 +3,7 @@ import { getBackendUrl } from '@/lib/get-backend-url';
 
 export async function POST(req: NextRequest) {
   try {
-    const response = await fetch(`${getBackendUrl()}/api/pi/auth`, {
+    const response = await fetch(`${getBackendUrl()}/api/pi/auth/verify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: await req.text(),

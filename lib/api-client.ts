@@ -7,7 +7,7 @@ function resolveApiBaseUrl(): string {
   if (typeof window !== 'undefined') {
     return '';
   }
-  const raw = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000').trim();
+  const raw = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4111').trim();
   if (/^https?:\/\//i.test(raw)) {
     return raw.replace(/\/$/, '');
   }
@@ -34,7 +34,18 @@ export interface ApiResponse<T = any> {
 }
 
 export class ApiClient {
-  submitContact: any;
+  async submitContact(data: {
+    name: string;
+    email: string;
+    subject: string;
+    message: string;
+  }): Promise<ApiResponse> {
+    return this.request('/api/contact', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
@@ -105,7 +116,7 @@ export class ApiClient {
     limit?: number;
     status?: string;
   }): Promise<ApiResponse> {
-    const searchParams = new URLSearchParams();
+    const searchParams = new URLSearchParams({ type: 'events' });
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined) {
@@ -113,8 +124,8 @@ export class ApiClient {
         }
       });
     }
-    
-    const endpoint = `/api/ecosystem?type=events${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+
+    const endpoint = `/api/ecosystem?${searchParams.toString()}`;
     return this.request(endpoint);
   }
 
@@ -123,7 +134,7 @@ export class ApiClient {
     limit?: number;
     status?: string;
   }): Promise<ApiResponse> {
-    const searchParams = new URLSearchParams();
+    const searchParams = new URLSearchParams({ type: 'hackathons' });
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined) {
@@ -131,8 +142,8 @@ export class ApiClient {
         }
       });
     }
-    
-    const endpoint = `/api/ecosystem?type=hackathons${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+
+    const endpoint = `/api/ecosystem?${searchParams.toString()}`;
     return this.request(endpoint);
   }
 
@@ -156,19 +167,6 @@ export class ApiClient {
     const endpoint = `/api/listings?${searchParams.toString()}`;
     return this.request(endpoint);
   }
-
-  // Contact form submission
-  // async submitContact(data: {
-  //   name: string;
-  //   email: string;
-  //   subject: string;
-  //   message: string;
-  // }): Promise<ApiResponse> {
-  //   return this.request('/api/contact', {
-  //     method: 'POST',
-  //     body: JSON.stringify(data),
-  //   });
-  // }
 
   // Listing submission methods - aligned with backend routes
   async submitBusinessListing(data: any): Promise<ApiResponse> {
@@ -246,7 +244,7 @@ export class ApiClient {
 
   // Health check
   async getHealth(): Promise<ApiResponse> {
-    return this.request('/health');
+    return this.request('/api/health');
   }
 
   // ---- Chart data endpoints ----
@@ -293,10 +291,3 @@ export class ApiClient {
 const apiClient = new ApiClient();
 
 export default apiClient;
-
-export async function getProjectByWallet(walletAddress: string) {
-  // Replace the URL below with your actual API endpoint for fetching a project by wallet address
-  const res = await fetch(`/api/projects?wallet=${encodeURIComponent(walletAddress)}`);
-  if (!res.ok) return null;
-  return res.json();
-}

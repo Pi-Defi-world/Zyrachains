@@ -125,7 +125,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
   }, [feedLoading, hasMore, feedType, feedPage, loadFeed]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && feedType !== 'leaderboard') {
       refreshBalance();
       refreshGameStats();
       loadFeed(feedType, 1);

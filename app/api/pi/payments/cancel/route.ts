@@ -1,40 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getPiNetworkBackendService } from '../../../../../lib/pi-network';
+import { NextRequest } from 'next/server';
+import { fetchBackend, proxyJson } from '@/lib/backend-proxy';
 
 export async function POST(request: NextRequest) {
   try {
-    const { paymentId } = await request.json();
+    const body = await request.json();
+    const { paymentId } = body;
 
     if (!paymentId) {
-      return NextResponse.json(
-        { error: 'Payment ID is required' },
-        { status: 400 }
-      );
+      return proxyJson({ error: 'Payment ID is required' }, 400);
     }
 
-    // Get Pi Network backend service
-    const piService = getPiNetworkBackendService();
-
-    // Cancel the payment on Pi Network
-    await piService.cancelPayment(paymentId);
-
-    console.log(`Payment ${paymentId} cancelled successfully`);
-
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Payment cancelled successfully',
-      paymentId 
+    const { status, data } = await fetchBackend('POST', '/api/pi/payments/cancel', {
+      body,
     });
 
+    return proxyJson(data, status);
   } catch (error) {
     console.error('Error cancelling payment:', error);
-    
-    return NextResponse.json(
-      { 
+    return proxyJson(
+      {
         error: 'Failed to cancel payment',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      500
     );
   }
 }

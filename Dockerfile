@@ -10,12 +10,15 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-ARG NEXT_PUBLIC_API_URL=http://localhost:4000
-ARG NEXT_PUBLIC_HORIZON_URL=http://localhost:8000
-ARG NEXT_PUBLIC_FORCE_LOCAL_BACKEND=true
+# Override via --build-arg; default to production backend so the image works standalone
+ARG NEXT_PUBLIC_API_URL=https://zyrachain-server.onrender.com
+ARG NEXT_PUBLIC_HORIZON_URL=https://api.testnet.minepi.com
+ARG NEXT_PUBLIC_ORACLE_URL=https://api.zyrachain.org
+ARG NEXT_PUBLIC_BASE_URL=https://testnet.zyrachain.org
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_HORIZON_URL=$NEXT_PUBLIC_HORIZON_URL
-ENV NEXT_PUBLIC_FORCE_LOCAL_BACKEND=$NEXT_PUBLIC_FORCE_LOCAL_BACKEND
+ENV NEXT_PUBLIC_ORACLE_URL=$NEXT_PUBLIC_ORACLE_URL
+ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN pnpm build
@@ -25,7 +28,10 @@ RUN corepack enable && corepack prepare pnpm@10 --activate
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV FORCE_LOCAL_BACKEND=true
+
+# Backend URL for runtime
+ARG NEXT_PUBLIC_API_URL=https://zyrachain-server.onrender.com
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-lock.yaml ./

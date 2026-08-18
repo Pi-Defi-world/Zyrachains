@@ -39,7 +39,7 @@ export function HomeSocialSection() {
     if (!isAuthenticated) { setLoading(false); return; }
     const fetchTrending = async () => {
       try {
-        const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4111';
         const url = `${base}/api/social/posts?type=trending&page=1&limit=3`;
         const res = await fetch(url, { headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` } });
         if (res.ok) { const data = await res.json(); setPosts(data.data || []); }
