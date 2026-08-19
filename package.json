@@ -15,6 +15,14 @@
     "lint:hard": "eslint . --ext .ts,.tsx",
     "init-blog": "node scripts/initialize-blog-data.js"
   },
+  "browserslist": [
+    "iOS >= 13.1",
+    "Safari >= 13.1",
+    "Chrome >= 90",
+    "Edge >= 90",
+    "Firefox >= 78",
+    "Samsung >= 12"
+  ],
   "dependencies": {
     "@auth/mongodb-adapter": "^3.10.0",
     "@aws-sdk/client-s3": "^3.844.0",
