@@ -106,6 +106,20 @@ const nextConfig: NextConfig = {
     return config;
   },
 
+  // Packages that ship modern JS (class static blocks, private fields,
+  // logical assignment) in their dist. Next does not transpile node_modules by
+  // default, which would break older browsers (iOS < 15) that the rest of the
+  // bundle supports via `browserslist`. Forcing these through SWC with our
+  // browserslist targets keeps the shipped bundle Safari-13.1-compatible.
+  transpilePackages: [
+    'next',
+    'framer-motion',
+    'motion',
+    'motion-dom',
+    'motion-utils',
+    '@radix-ui/react-collection',
+  ],
+
   allowedDevOrigins: ["http://10.2.0.2:8000"],
 
   async headers() {

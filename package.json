@@ -7,7 +7,7 @@
     "dev:quiet": "cross-env NODE_ENV=development NEXT_TELEMETRY_DISABLED=1 NODE_OPTIONS=\"--no-warnings\" next dev -p 8000 --webpack",
     "dev:silent": "cross-env NODE_ENV=development NEXT_TELEMETRY_DISABLED=1 NODE_OPTIONS=\"--no-warnings --silent\" next dev -p 8000 --webpack",
     "dev:filter": "powershell -ExecutionPolicy Bypass -File dev-quiet.ps1",
-    "build": "next build --webpack",
+    "build": "next build --webpack && node scripts/verify-compat.mjs",
     "start": "next start -p 8000",
     "lint": "eslint .",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
