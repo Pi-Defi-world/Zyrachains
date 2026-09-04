@@ -1,5 +1,5 @@
-const DEFAULT_LOCAL_URL = 'http://localhost:4111';
-const DEFAULT_REMOTE_URL = 'https://server.zyrachain.org';
+export const DEFAULT_LOCAL_URL = 'http://localhost:4111';
+export const DEFAULT_REMOTE_URL = 'https://api.zyrachain.org';
 
 const normalize = (url: string): string => {
   const trimmed = url.trim();
@@ -34,6 +34,17 @@ const shouldPreferLocal = (): boolean => {
   return process.env.NODE_ENV === 'development';
 };
 
+const BAD_HOSTNAMES = new Set(['server.zyrachains.org']);
+
+const isBadHostname = (url: string): boolean => {
+  try {
+    const { hostname } = new URL(url);
+    return BAD_HOSTNAMES.has(hostname);
+  } catch {
+    return false;
+  }
+};
+
 const resolveBackendBase = (): string => {
   const preferLocal = shouldPreferLocal();
 
@@ -49,7 +60,12 @@ const resolveBackendBase = (): string => {
   ]);
 
   const local = normalize(localCandidate ?? DEFAULT_LOCAL_URL);
-  const remote = normalize(remoteCandidate ?? DEFAULT_REMOTE_URL);
+  let remote = normalize(remoteCandidate ?? DEFAULT_REMOTE_URL);
+
+  if (isBadHostname(remote)) {
+    console.warn('[getBackendUrl] Rejecting bad hostname, falling back to default:', remote);
+    remote = DEFAULT_REMOTE_URL;
+  }
 
   return preferLocal ? local : remote;
 };
