@@ -44,7 +44,22 @@ const ENDPOINTS: EndpointDef[] = [
   },
   {
     method: 'ALL', path: '/api/oracle/horizon/*', auth: 'api-key',
-    description: 'Transparent proxy to Pi Mainnet Horizon API (accounts, transactions, operations, effects, ledgers, payments, trades, offers).',
+    description: 'Transparent proxy to Pi Mainnet Horizon API via Suban (accounts, transactions, operations, effects, ledgers, payments, trades, offers).',
+    request: 'curl -H "X-API-Key: zyra_..." "https://api.zyrachain.org/api/oracle/horizon/accounts/GABC..."'
+  },
+  {
+    method: 'GET', path: '/api/oracle/horizon/ledgers', auth: 'api-key',
+    description: 'List recent ledgers from Pi Mainnet Horizon (Suban).',
+    request: 'curl -H "X-API-Key: zyra_..." "https://api.zyrachain.org/api/oracle/horizon/ledgers?order=desc&limit=10"'
+  },
+  {
+    method: 'GET', path: '/api/oracle/horizon/trades', auth: 'api-key',
+    description: 'List recent trades from Pi Mainnet Horizon (Suban).',
+    request: 'curl -H "X-API-Key: zyra_..." "https://api.zyrachain.org/api/oracle/horizon/trades?order=desc&limit=10"'
+  },
+  {
+    method: 'GET', path: '/api/oracle/horizon/accounts/{address}', auth: 'api-key',
+    description: 'Get account details from Pi Mainnet Horizon (Suban).',
     request: 'curl -H "X-API-Key: zyra_..." "https://api.zyrachain.org/api/oracle/horizon/accounts/GABC..."'
   },
 ];
@@ -88,6 +103,8 @@ const ApiDocumentationPage: React.FC = () => {
             Access aggregated Pi Network price data via{' '}
             <code className="text-xs bg-muted px-1.5 py-0.5 rounded">{apiBase}/api/oracle</code>.
             Pay as you go — purchase an API key with Pi to get started.
+            Horizon and RPC endpoints powered by{' '}
+            <span className="font-medium text-foreground">Suban</span>.
           </p>
         </div>
 
@@ -408,12 +425,62 @@ curl -H "X-API-Key: zyra_..." "${apiBase}/api/oracle/horizon/accounts/GABC..."`}
                 <tr className="border-b border-border/20">
                   <td className="py-2">Horizon Proxy</td>
                   <td className="py-2">10-second timeout</td>
-                  <td className="py-2">Forwarded to Pi Mainnet Horizon</td>
+                  <td className="py-2">Forwarded to Pi Mainnet Horizon via Suban</td>
                 </tr>
                 <tr>
                   <td className="py-2">Cache</td>
                   <td className="py-2">10-second TTL</td>
                   <td className="py-2">Price endpoint only</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Suban API Services */}
+        <div className="bg-card rounded-xl border border-border/50 shadow-sm p-4 sm:p-6 mb-6">
+          <div className="flex items-center space-x-3 mb-4">
+            <Wifi className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-semibold text-foreground">Suban API Services</h2>
+          </div>
+          <p className="text-xs text-muted-foreground mb-4">
+            All Horizon, Oracle, and RPC endpoints are served from the Suban infrastructure.
+            Direct access is available for advanced use cases.
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border/30">
+                  <th className="text-left py-2 font-medium text-foreground">Service</th>
+                  <th className="text-left py-2 font-medium text-foreground">URL</th>
+                  <th className="text-left py-2 font-medium text-foreground hidden md:table-cell">Purpose</th>
+                </tr>
+              </thead>
+              <tbody className="text-muted-foreground text-xs">
+                <tr className="border-b border-border/20">
+                  <td className="py-2 font-medium text-foreground">Mainnet Horizon</td>
+                  <td className="py-2"><code className="bg-muted/50 px-1 py-0.5 rounded">https://horizon.suban.org/horizon</code></td>
+                  <td className="py-2 hidden md:table-cell">Stellar Horizon API (ledgers, accounts, transactions, trades)</td>
+                </tr>
+                <tr className="border-b border-border/20">
+                  <td className="py-2 font-medium text-foreground">Testnet Horizon</td>
+                  <td className="py-2"><code className="bg-muted/50 px-1 py-0.5 rounded">https://testnet.suban.org</code></td>
+                  <td className="py-2 hidden md:table-cell">Stellar Horizon API for testnet</td>
+                </tr>
+                <tr className="border-b border-border/20">
+                  <td className="py-2 font-medium text-foreground">Oracle</td>
+                  <td className="py-2"><code className="bg-muted/50 px-1 py-0.5 rounded">https://oracle.suban.org</code></td>
+                  <td className="py-2 hidden md:table-cell">Price feeds, chain stats, health check</td>
+                </tr>
+                <tr className="border-b border-border/20">
+                  <td className="py-2 font-medium text-foreground">RPC Mainnet</td>
+                  <td className="py-2"><code className="bg-muted/50 px-1 py-0.5 rounded">https://rpc.suban.org</code></td>
+                  <td className="py-2 hidden md:table-cell">Pi RPC mainnet</td>
+                </tr>
+                <tr>
+                  <td className="py-2 font-medium text-foreground">RPC Testnet</td>
+                  <td className="py-2"><code className="bg-muted/50 px-1 py-0.5 rounded">https://testrpc.suban.org</code></td>
+                  <td className="py-2 hidden md:table-cell">Pi RPC testnet</td>
                 </tr>
               </tbody>
             </table>

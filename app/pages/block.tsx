@@ -33,7 +33,8 @@ const BlocksPage: React.FC = () => {
 
   const fetchStats = async () => {
     try {
-      const apiUrl = 'https://api.mainnet.minepi.com/ledgers?order=desc&limit=100';
+      const horizonUrl = process.env.NEXT_PUBLIC_HORIZON_BASE_URL || 'https://horizon.suban.org/horizon';
+      const apiUrl = `${horizonUrl}/ledgers?order=desc&limit=100`;
       const response = await fetch(apiUrl);
       const data = await response.json();
       const records = data._embedded?.records || [];

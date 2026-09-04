@@ -123,7 +123,8 @@ const AccountDetail: React.FC<AccountDetailProps> = ({ address }) => {
   const fetchTransactions = async (Link = "", page = 1) => {
     try {
       setTabLoading(true);
-      const response = await horizon.getTransactions("", Link!=""?Link:"https://api.mainnet.minepi.com/accounts/"+address+"/transactions?limit=10&order=desc");
+      const horizonUrl = process.env.NEXT_PUBLIC_HORIZON_BASE_URL || 'https://horizon.suban.org/horizon';
+      const response = await horizon.getTransactions("", Link!=""?Link:`${horizonUrl}/accounts/${address}/transactions?limit=10&order=desc`);
       if (Link==""||Link.indexOf("order=desc") > 0) {
         setTransactions(response._embedded.records);
         setTxNextLink(response._links.next.href);
@@ -146,7 +147,8 @@ const AccountDetail: React.FC<AccountDetailProps> = ({ address }) => {
   const fetchOperations = async (Link = "", page = 1) => {
     try {
       setTabLoading(true);
-      const response = await horizon.getOperations("", Link!=""?Link:"https://api.mainnet.minepi.com/accounts/"+address+"/operations?limit=10&order=desc");
+      const horizonUrl = process.env.NEXT_PUBLIC_HORIZON_BASE_URL || 'https://horizon.suban.org/horizon';
+      const response = await horizon.getOperations("", Link!=""?Link:`${horizonUrl}/accounts/${address}/operations?limit=10&order=desc`);
        if (Link==""||Link.indexOf("order=desc") > 0) {
       setOperations(response._embedded.records);
       setOpNextLink(response._links.next.href);
@@ -169,7 +171,8 @@ const AccountDetail: React.FC<AccountDetailProps> = ({ address }) => {
   const fetchEffects = async (Link = "", page = 1) => {
     try {
       setTabLoading(true);
-      const response = await horizon.getEffects(address||"", Link!=""?Link:"https://api.mainnet.minepi.com/accounts/"+address+"/effects?limit=10&order=desc");
+      const horizonUrl = process.env.NEXT_PUBLIC_HORIZON_BASE_URL || 'https://horizon.suban.org/horizon';
+      const response = await horizon.getEffects(address||"", Link!=""?Link:`${horizonUrl}/accounts/${address}/effects?limit=10&order=desc`);
        if (Link==""||Link.indexOf("order=desc") > 0) {
       setEffects(response._embedded.records);
       setEfNextLink(response._links.next.href);

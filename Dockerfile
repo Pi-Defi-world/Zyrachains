@@ -12,7 +12,7 @@ COPY . .
 
 # Override via --build-arg; default to production backend so the image works standalone
 ARG NEXT_PUBLIC_API_URL=https://zyrachain-server.onrender.com
-ARG NEXT_PUBLIC_HORIZON_URL=https://api.testnet.minepi.com
+ARG NEXT_PUBLIC_HORIZON_URL=https://horizon.suban.org/horizon
 ARG NEXT_PUBLIC_ORACLE_URL=https://api.zyrachain.org
 ARG NEXT_PUBLIC_BASE_URL=https://testnet.zyrachain.org
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL

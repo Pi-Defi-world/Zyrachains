@@ -53,7 +53,7 @@ type TradeRecord = {
   counter_asset_code?: string;
 };
 
-const TESTNET_HORIZON = 'https://api.testnet.minepi.com';
+const TESTNET_HORIZON = process.env.NEXT_PUBLIC_TESTNET_HORIZON_URL || 'https://testnet.suban.org';
 
 async function fetchTestnetAssetsPools(): Promise<{ assets: AssetRecord[]; pools: PoolRecord[] }> {
   try {

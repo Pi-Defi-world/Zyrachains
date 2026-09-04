@@ -59,7 +59,8 @@ export default function AssetsTab({ onLoad }: AssetsTabProps) {
       if (!url) {
         // Initial load: fetch ALL pages for accurate aggregate stats
         const allRecords: Asset[] = [];
-        let nextUrl: string | null = 'https://api.testnet.minepi.com/assets?limit=200&order=desc';
+        const testnetUrl = process.env.NEXT_PUBLIC_TESTNET_HORIZON_URL || 'https://testnet.suban.org';
+        let nextUrl: string | null = `${testnetUrl}/assets?limit=200&order=desc`;
         let pages = 0;
         while (nextUrl && pages < 5) {
           const r: Response = await fetch(nextUrl);

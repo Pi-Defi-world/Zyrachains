@@ -77,7 +77,8 @@ export default function PoolTab({ onLoad }: PoolTabProps) {
         /* fallback */
       }
 
-      const apiUrl = 'https://api.testnet.minepi.com/liquidity_pools?limit=200&order=desc';
+      const testnetUrl = process.env.NEXT_PUBLIC_TESTNET_HORIZON_URL || 'https://testnet.suban.org';
+      const apiUrl = `${testnetUrl}/liquidity_pools?limit=200&order=desc`;
       const cacheKey = `pools_${btoa(apiUrl)}`;
       const cached = getCached(cacheKey);
       if (cached) {

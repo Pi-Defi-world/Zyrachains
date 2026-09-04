@@ -74,7 +74,8 @@ export default function TradesHistoryTab({ onLoad }: TradesHistoryTabProps) {
         }
       }
 
-      const apiUrl = url || 'https://api.mainnet.minepi.com/trades?limit=50&order=desc';
+      const horizonUrl = process.env.NEXT_PUBLIC_HORIZON_BASE_URL || 'https://horizon.suban.org/horizon';
+      const apiUrl = url || `${horizonUrl}/trades?limit=50&order=desc`;
       const cacheKey = `trades_${btoa(apiUrl)}`;
       const cached = getCached(cacheKey);
       if (cached) { setTradesData(cached); if (isInitial) onLoad?.(cached, true); setLoading(false); return; }
