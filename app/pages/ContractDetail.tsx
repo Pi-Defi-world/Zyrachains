@@ -11,6 +11,7 @@ import { usePageMetadata } from "@/context/pagemetadataContext";
 import CopyIcon from "@/components/copyIcon";
 import { useLanguage } from "@/context/languagecontext";
 import { ArrowLeft, FileCode, Database, ArrowRightLeft, Zap } from "lucide-react";
+import FavoriteButton from "@/components/FavoriteButton";
 
 interface ContractDetailProps {
   contractId: string;
@@ -101,9 +102,19 @@ const ContractDetail: React.FC<ContractDetailProps> = ({ contractId }) => {
         <Link href="/contracts" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 mb-4">
           <ArrowLeft className="w-4 h-4" /> Back to Contracts
         </Link>
-        <div className="flex items-center gap-3 mb-2">
-          <FileCode className="w-6 h-6 text-primary" />
-          <h1 className="text-2xl font-bold">Smart Contract</h1>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3">
+            <FileCode className="w-6 h-6 text-primary" />
+            <h1 className="text-2xl font-bold">Smart Contract</h1>
+          </div>
+          <FavoriteButton
+            id={contractId}
+            type="contract"
+            label={`Contract ${contractId.slice(0, 12)}...${contractId.slice(-8)}`}
+            detail={contract.admin ? `Admin: ${contract.admin.slice(0, 12)}...` : undefined}
+            href={`/contracts/${contractId}`}
+            size="sm"
+          />
         </div>
       </div>
 

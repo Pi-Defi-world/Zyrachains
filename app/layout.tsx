@@ -9,6 +9,7 @@ import GlobalMobileElements from "@/components/GlobalMobileElements";
 import { ThemeProvider } from "@/components/theme-provider";
 import NavbarWithMobile from '@/components/navbar';
 import { AddressProvider } from '@/context/AddressContext';
+import { FavoritesProvider } from '@/context/FavoritesContext';
 import { ToastProvider } from '@/components/context/ToastContext';
 import { ToastContainer } from '@/components/ui/toast-container';
 import { BackgroundAnimation } from '@/components/BackgroundAnimation';
@@ -63,6 +64,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <PiNetworkProvider>
             <SocialProvider>
             <AddressProvider>
+              <FavoritesProvider>
               <LanguageProvider>
                 <PageMetadataProvider>
                   <ToastProvider>
@@ -82,6 +84,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   </ToastProvider>
                 </PageMetadataProvider>
               </LanguageProvider>
+              </FavoritesProvider>
             </AddressProvider>
             </SocialProvider>
           </PiNetworkProvider>

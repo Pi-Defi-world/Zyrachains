@@ -18,6 +18,7 @@ import { describePredicate, getUnlockTime } from "../../utils/predicate";
 import { useLanguage } from "@/context/languagecontext";
 import { LabledAddress } from "../../utils/addresses";
 import { ArrowLeft, Clock, Lock, Gift, Wallet, ArrowRight } from "lucide-react";
+import FavoriteButton from "@/components/FavoriteButton";
 
 interface AccountDetailProps {
   address: string;
@@ -301,6 +302,14 @@ const AccountDetail: React.FC<AccountDetailProps> = ({ address }) => {
                 </Badge>
               )}
             </div>
+            <FavoriteButton
+              id={address}
+              type="account"
+              label={`${address.slice(0, 12)}...${address.slice(-8)}`}
+              detail={accountData?.balances?.[0] ? `Balance: ${formatAmount(parseFloat(accountData.balances[0].balance))} PI` : undefined}
+              href={`/account/${address}`}
+              size="sm"
+            />
           </div>
 
           {/* Overview Cards */}

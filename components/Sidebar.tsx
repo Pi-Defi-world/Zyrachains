@@ -8,7 +8,7 @@ import {
   Coins, Droplets, ArrowRightLeft, TrendingUp, Wallet,
   Globe, Calendar, Sparkles, Star, AlertTriangle,
   ShieldCheck, Zap, MessageSquare, User, ChevronLeft,
-  ChevronRight, Menu, X, GripHorizontal, FileCode,
+  ChevronRight, Menu, X, GripHorizontal, FileCode, Heart,
 } from 'lucide-react';
 
 interface NavGroup {
@@ -23,6 +23,7 @@ const navGroups: NavGroup[] = [
     links: [
       { href: '/', label: 'Dashboard' },
       { href: '/block', label: 'Block Explorer' },
+      { href: '/favorites', label: 'Favorites' },
     ],
   },
   {
