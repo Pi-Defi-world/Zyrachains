@@ -34,6 +34,7 @@ const Navbar: React.FC = () => {
               <div className="flex items-center gap-10 text-sm font-medium">
                 <Link href="/" className="text-foreground/70 hover:text-foreground interactive-element">Home</Link>
                 <Link href="/block" className="text-foreground/70 hover:text-foreground interactive-element">Explorer</Link>
+                <Link href="/contracts" className="text-foreground/70 hover:text-foreground interactive-element">Contracts</Link>
                 <Link href="/pct-wallet-monitor" className="text-foreground/70 hover:text-foreground interactive-element">Monitors</Link>
                 <Link href="/social" className="text-foreground/70 hover:text-foreground interactive-element">Social</Link>
                 <Link href="/api-documentation" className="text-foreground/70 hover:text-foreground interactive-element">API</Link>

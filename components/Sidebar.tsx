@@ -8,7 +8,7 @@ import {
   Coins, Droplets, ArrowRightLeft, TrendingUp, Wallet,
   Globe, Calendar, Sparkles, Star, AlertTriangle,
   ShieldCheck, Zap, MessageSquare, User, ChevronLeft,
-  ChevronRight, Menu, X, GripHorizontal,
+  ChevronRight, Menu, X, GripHorizontal, FileCode,
 } from 'lucide-react';
 
 interface NavGroup {
@@ -31,6 +31,7 @@ const navGroups: NavGroup[] = [
       { href: '/Transaction-list', label: 'Transactions' },
       { href: '/operations', label: 'Operations' },
       { href: '/trades-history', label: 'Trades' },
+      { href: '/contracts', label: 'Smart Contracts' },
       { href: '/accountStats', label: 'Network Stats' },
     ],
   },

@@ -65,7 +65,6 @@ export default function PoolTab({ onLoad }: PoolTabProps) {
         const r = await fetch('/api/v2/home/assets-pools');
         const j = await r.json();
         const pools = j?.data?.pools;
-        // Only use snapshot if it has actual data (mainnet returns empty arrays)
         const records = (pools as PoolsApiResponse | undefined)?._embedded?.records || [];
         if (j?.success && records.length > 0) {
           setPools(records);
@@ -77,24 +76,22 @@ export default function PoolTab({ onLoad }: PoolTabProps) {
         /* fallback */
       }
 
-      const testnetUrl = process.env.NEXT_PUBLIC_TESTNET_HORIZON_URL || 'https://testnet.suban.org';
-      const apiUrl = `${testnetUrl}/liquidity_pools?limit=200&order=desc`;
-      const cacheKey = `pools_${btoa(apiUrl)}`;
-      const cached = getCached(cacheKey);
-      if (cached) {
-        const records = cached._embedded?.records || [];
-        setPools(records);
-        onLoad?.(records);
-        setLoading(false);
-        return;
+      // Use server-side proxy to avoid CORS issues
+      try {
+        const r = await fetch('/api/horizon/testnet/assets-pools');
+        const j = await r.json();
+        const poolRecords = j?.data?.pools;
+        if (j?.success && Array.isArray(poolRecords) && poolRecords.length > 0) {
+          setPools(poolRecords);
+          onLoad?.(poolRecords);
+          setLoading(false);
+          return;
+        }
+      } catch {
+        /* fallback */
       }
-      const response = await fetch(apiUrl);
-      if (!response.ok) throw new Error('Failed to fetch liquidity pools');
-      const data: PoolsApiResponse = await response.json();
-      setCached(cacheKey, data);
-      const records = data._embedded?.records || [];
-      setPools(records);
-      onLoad?.(records);
+
+      setError('No pools available');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {

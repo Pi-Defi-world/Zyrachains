@@ -57,28 +57,21 @@ export default function AssetsTab({ onLoad }: AssetsTabProps) {
     try {
       setLoading(true);
       if (!url) {
-        // Initial load: fetch ALL pages for accurate aggregate stats
-        const allRecords: Asset[] = [];
-        const testnetUrl = process.env.NEXT_PUBLIC_TESTNET_HORIZON_URL || 'https://testnet.suban.org';
-        let nextUrl: string | null = `${testnetUrl}/assets?limit=200&order=desc`;
-        let pages = 0;
-        while (nextUrl && pages < 5) {
-          const r: Response = await fetch(nextUrl);
-          const j: Record<string, unknown> = await r.json();
-          const recs = ((j._embedded as Record<string, unknown> | undefined)?.records ?? []) as Asset[];
-          allRecords.push(...recs);
-          nextUrl = ((j._links as Record<string, unknown> | undefined)?.next as Record<string, unknown> | undefined)?.href as string ?? null;
-          pages++;
+        // Initial load: use server-side proxy to avoid CORS issues
+        const proxyRes = await fetch('/api/horizon/testnet/assets-pools');
+        const proxyJson = await proxyRes.json();
+        if (proxyJson?.success && proxyJson?.data?.assets) {
+          const allRecords = proxyJson.data.assets as Asset[];
+          const fullData: AssetsApiResponse = {
+            _links: { self: { href: '' } },
+            _embedded: { records: allRecords },
+          };
+          setAssetsData(fullData);
+          onLoad?.(fullData, true);
+          setLoading(false);
+          return;
         }
-        // Build a synthetic API response with all records
-        const fullData: AssetsApiResponse = {
-          _links: { self: { href: '' } },
-          _embedded: { records: allRecords },
-        };
-        setAssetsData(fullData);
-        onLoad?.(fullData, true);
-        setLoading(false);
-        return;
+        throw new Error('Proxy returned no data');
       }
 
       // Pagination: fetch single page

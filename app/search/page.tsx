@@ -18,11 +18,14 @@ interface SearchResult {
   href: string;
 }
 
-function detectInputType(query: string): 'account' | 'transaction' | 'block' | 'unknown' {
+function detectInputType(query: string): 'account' | 'transaction' | 'block' | 'asset' | 'unknown' {
   const trimmed = query.trim();
   if (/^G[A-Za-z0-9]{55}$/.test(trimmed)) return 'account';
+  if (/^G[A-Za-z0-9]{39,}$/.test(trimmed)) return 'account';
   if (/^[0-9a-fA-F]{64}$/.test(trimmed)) return 'transaction';
-  if (/^\d+$/.test(trimmed)) return 'block';
+  if (/^[0-9a-fA-F]{40,63}$/.test(trimmed)) return 'transaction';
+  if (/^\d{2,}$/.test(trimmed)) return 'block';
+  if (/^[A-Z]{1,12}$/.test(trimmed) && trimmed.length >= 2) return 'asset';
   return 'unknown';
 }
 
@@ -112,6 +115,25 @@ function SearchContent() {
               detail: `${data.successful_transaction_count} txs — ${new Date(data.closed_at).toLocaleString()}`,
               href: `/block/${data.sequence}`,
             });
+          }
+        } catch { /* not found */ }
+      }
+
+      if (type === 'asset') {
+        try {
+          const res = await fetch(`${HORIZON_URL}/assets?asset_code=${encodeURIComponent(trimmed)}&limit=5`);
+          if (res.ok) {
+            const data = await res.json();
+            const records = data._embedded?.records || [];
+            for (const asset of records.slice(0, 5)) {
+              found.push({
+                type: 'account',
+                id: `${asset.asset_code}:${asset.asset_issuer}`,
+                label: `${asset.asset_code} — ${asset.accounts?.authorized || 0} holders`,
+                detail: `Issuer: ${asset.asset_issuer?.slice(0, 8)}...${asset.asset_issuer?.slice(-8)}`,
+                href: `/asset/${encodeURIComponent(asset.asset_code + ':' + asset.asset_issuer)}`,
+              });
+            }
           }
         } catch { /* not found */ }
       }

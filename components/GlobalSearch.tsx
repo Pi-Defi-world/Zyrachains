@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, X, Command, Home, BarChart3, Activity, Users, Book, AlertCircle, Layers, Coins, Droplets, TrendingUp, ArrowRightLeft, ShieldCheck, Zap, Wallet, Globe, Calendar, Star, User, Hash, Loader2, ArrowRight } from 'lucide-react';
+import { Search, X, Command, Home, BarChart3, Activity, Users, Book, AlertCircle, Layers, Coins, Droplets, TrendingUp, ArrowRightLeft, ShieldCheck, Zap, Wallet, Globe, Calendar, Star, User, Hash, Loader2, ArrowRight, FileCode } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -30,6 +30,7 @@ const SEARCH_DATA: SearchResult[] = [
   { id: 'txs', title: 'Transactions', description: 'Latest transactions', href: '/Transaction-list', icon: <ArrowRightLeft className="w-4 h-4" />, category: 'navigation' },
   { id: 'ops', title: 'Operations', description: 'Latest operations', href: '/operations', icon: <Layers className="w-4 h-4" />, category: 'navigation' },
   { id: 'trades', title: 'Trades History', description: 'Trade records', href: '/trades-history', icon: <TrendingUp className="w-4 h-4" />, category: 'navigation' },
+  { id: 'contracts', title: 'Smart Contracts', description: 'Browse deployed contracts', href: '/contracts', icon: <FileCode className="w-4 h-4" />, category: 'navigation' },
   { id: 'assets', title: 'Assets', description: 'All issued assets', href: '/assets', icon: <Coins className="w-4 h-4" />, category: 'navigation' },
   { id: 'pools', title: 'Liquidity Pools', description: 'All liquidity pools', href: '/pool', icon: <Droplets className="w-4 h-4" />, category: 'navigation' },
   { id: 'stats', title: 'Network Stats', description: 'Account & supply stats', href: '/accountStats', icon: <Activity className="w-4 h-4" />, category: 'navigation' },
@@ -52,11 +53,14 @@ const SEARCH_DATA: SearchResult[] = [
   { id: 'mc-network', title: 'Network', description: 'Block, TPS, utilization', href: '/?tab=network', icon: <Activity className="w-4 h-4" />, category: 'metric' },
 ];
 
-function detectInputType(query: string): 'account' | 'transaction' | 'block' | null {
+function detectInputType(query: string): 'account' | 'transaction' | 'block' | 'asset' | null {
   const trimmed = query.trim();
   if (/^G[A-Za-z0-9]{55}$/.test(trimmed)) return 'account';
+  if (/^G[A-Za-z0-9]{39,}$/.test(trimmed)) return 'account';
   if (/^[0-9a-fA-F]{64}$/.test(trimmed)) return 'transaction';
+  if (/^[0-9a-fA-F]{40,63}$/.test(trimmed)) return 'transaction';
   if (/^\d{2,}$/.test(trimmed)) return 'block';
+  if (/^[A-Z]{1,12}$/.test(trimmed) && trimmed.length >= 2) return 'asset';
   return null;
 }
 
@@ -67,42 +71,65 @@ async function searchBlockchain(query: string): Promise<BlockchainResult[]> {
 
   try {
     if (type === 'account') {
-      const res = await fetch(`${HORIZON_URL}/accounts/${encodeURIComponent(trimmed)}`);
-      if (res.ok) {
-        const data = await res.json();
-        const bal = data.balances?.find((b: any) => b.asset_type === 'native')?.balance || '0';
-        results.push({
-          type: 'account',
-          id: data.id,
-          label: `${data.id.slice(0, 12)}...${data.id.slice(-8)}`,
-          detail: `Balance: ${bal} PI`,
-          href: `/account/${data.id}`,
-        });
-      }
+      try {
+        const res = await fetch(`${HORIZON_URL}/accounts/${encodeURIComponent(trimmed)}`);
+        if (res.ok) {
+          const data = await res.json();
+          const bal = data.balances?.find((b: any) => b.asset_type === 'native')?.balance || '0';
+          results.push({
+            type: 'account',
+            id: data.id,
+            label: `${data.id.slice(0, 12)}...${data.id.slice(-8)}`,
+            detail: `Balance: ${bal} PI`,
+            href: `/account/${data.id}`,
+          });
+        }
+      } catch { /* not found */ }
     } else if (type === 'transaction') {
-      const res = await fetch(`${HORIZON_URL}/transactions/${encodeURIComponent(trimmed)}`);
-      if (res.ok) {
-        const data = await res.json();
-        results.push({
-          type: 'transaction',
-          id: data.hash,
-          label: `${data.hash.slice(0, 12)}...${data.hash.slice(-8)}`,
-          detail: `${data.successful ? 'Successful' : 'Failed'} — ${data.operation_count} ops`,
-          href: `/tx/${data.hash}`,
-        });
-      }
+      try {
+        const res = await fetch(`${HORIZON_URL}/transactions/${encodeURIComponent(trimmed)}`);
+        if (res.ok) {
+          const data = await res.json();
+          results.push({
+            type: 'transaction',
+            id: data.hash,
+            label: `${data.hash.slice(0, 12)}...${data.hash.slice(-8)}`,
+            detail: `${data.successful ? 'Successful' : 'Failed'} — ${data.operation_count} ops`,
+            href: `/tx/${data.hash}`,
+          });
+        }
+      } catch { /* not found */ }
     } else if (type === 'block') {
-      const res = await fetch(`${HORIZON_URL}/ledgers/${trimmed}`);
-      if (res.ok) {
-        const data = await res.json();
-        results.push({
-          type: 'block',
-          id: String(data.sequence),
-          label: `Block #${data.sequence}`,
-          detail: `${data.successful_transaction_count} txs — ${new Date(data.closed_at).toLocaleString()}`,
-          href: `/block/${data.sequence}`,
-        });
-      }
+      try {
+        const res = await fetch(`${HORIZON_URL}/ledgers/${trimmed}`);
+        if (res.ok) {
+          const data = await res.json();
+          results.push({
+            type: 'block',
+            id: String(data.sequence),
+            label: `Block #${data.sequence}`,
+            detail: `${data.successful_transaction_count} txs — ${new Date(data.closed_at).toLocaleString()}`,
+            href: `/block/${data.sequence}`,
+          });
+        }
+      } catch { /* not found */ }
+    } else if (type === 'asset') {
+      try {
+        const res = await fetch(`${HORIZON_URL}/assets?asset_code=${encodeURIComponent(trimmed)}&limit=5`);
+        if (res.ok) {
+          const data = await res.json();
+          const records = data._embedded?.records || [];
+          for (const asset of records.slice(0, 3)) {
+            results.push({
+              type: 'account',
+              id: `${asset.asset_code}:${asset.asset_issuer}`,
+              label: `${asset.asset_code} — ${asset.accounts?.authorized || 0} holders`,
+              detail: `Issuer: ${asset.asset_issuer?.slice(0, 8)}...${asset.asset_issuer?.slice(-8)}`,
+              href: `/asset/${encodeURIComponent(asset.asset_code + ':' + asset.asset_issuer)}`,
+            });
+          }
+        }
+      } catch { /* not found */ }
     }
   } catch { /* search failed silently */ }
 

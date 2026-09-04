@@ -945,5 +945,82 @@ export const horizon = {
       console.error('Error fetching claimable balances:', error);
       return 0; // Return 0 as default value
     }
-  }
+  },
+
+  // 🔍 Get all contracts
+  getContracts: async (link = "", limit = 20) => {
+    try {
+      let path = `/contracts?limit=${limit}&order=desc`;
+      if (link) {
+        path = link.substring(30);
+      }
+      const response = await api_own.get(path);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching contracts:', error);
+      return {
+        _embedded: { records: [] },
+        _links: { self: { href: '' }, next: { href: '' }, prev: { href: '' } }
+      };
+    }
+  },
+
+  // 🔍 Get contract by ID
+  getContractById: async (contractId: string) => {
+    try {
+      const response = await api_own.get(`/contracts/${encodeURIComponent(contractId)}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching contract:', error);
+      return null;
+    }
+  },
+
+  // 🔍 Get contract transactions
+  getContractTransactions: async (contractId: string, limit = 20) => {
+    try {
+      const response = await api_own.get(`/contracts/${encodeURIComponent(contractId)}/transactions`, {
+        params: { limit, order: 'desc' }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching contract transactions:', error);
+      return {
+        _embedded: { records: [] },
+        _links: { self: { href: '' }, next: { href: '' }, prev: { href: '' } }
+      };
+    }
+  },
+
+  // 🔍 Get contract effects
+  getContractEffects: async (contractId: string, limit = 20) => {
+    try {
+      const response = await api_own.get(`/contracts/${encodeURIComponent(contractId)}/effects`, {
+        params: { limit, order: 'desc' }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching contract effects:', error);
+      return {
+        _embedded: { records: [] },
+        _links: { self: { href: '' }, next: { href: '' }, prev: { href: '' } }
+      };
+    }
+  },
+
+  // 🔍 Get contract data entries
+  getContractData: async (contractId: string, limit = 20) => {
+    try {
+      const response = await api_own.get(`/contracts/${encodeURIComponent(contractId)}/data`, {
+        params: { limit, order: 'desc' }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching contract data:', error);
+      return {
+        _embedded: { records: [] },
+        _links: { self: { href: '' }, next: { href: '' }, prev: { href: '' } }
+      };
+    }
+  },
 };
