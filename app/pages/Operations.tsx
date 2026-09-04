@@ -94,6 +94,14 @@ const OperationsPage: React.FC = () => {
     fetchInitialData();
   }, []);
 
+  // Auto-refresh every 15s
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchOperations();
+    }, 15000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleRefresh = async () => {
     await Promise.all([fetchOperations(), fetchPiPrice()]);
   };

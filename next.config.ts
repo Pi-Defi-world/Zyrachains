@@ -72,7 +72,7 @@ const nextConfig: NextConfig = {
       // Example redirect for compatibility with old routes
       {
         source: '/search/:id',
-        destination: '/account/:id',
+        destination: '/search?q=:id',
         permanent: true,
       },
     ];

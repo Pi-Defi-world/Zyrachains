@@ -40,6 +40,14 @@ export default function TradesHistoryTab({ onLoad }: TradesHistoryTabProps) {
   const setCached = (key: string, data: any) => { try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data })); } catch {} };
 
   useEffect(() => { fetchTrades(undefined, true); }, []);
+
+  // Auto-refresh every 15s
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchTrades(undefined, false);
+    }, 15000);
+    return () => clearInterval(interval);
+  }, []);
   useEffect(() => {
     if (tradesData?._embedded?.records) {
       const filtered = tradesData._embedded.records.filter(trade =>

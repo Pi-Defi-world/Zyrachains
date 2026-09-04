@@ -84,6 +84,14 @@ const TransactionList: React.FC = () => {
     fetchInitialData();
   }, []);
 
+  // Auto-refresh every 15s
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchPayments();
+    }, 15000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleRefresh = async () => {
     await fetchPayments();
   };

@@ -105,6 +105,15 @@ const BlocksPage: React.FC = () => {
     fetchInitialData();
   }, []);
 
+  // Auto-refresh every 30s
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchBlocks();
+      fetchStats();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Manual refresh function
   const handleRefresh = async () => {
     await Promise.all([fetchBlocks(), fetchStats()]);
