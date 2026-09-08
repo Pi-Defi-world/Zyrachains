@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 
-const TESTNET_HORIZON = process.env.NEXT_PUBLIC_TESTNET_HORIZON_URL || 'https://testnet.suban.org';
+const TESTNET_HORIZON = process.env.NEXT_PUBLIC_TESTNET_HORIZON_URL || 'https://api.testnet.minepi.com';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 120; // 2 min cache
+export const revalidate = 120;
 
 interface HorizonRecord {
   asset_type?: string;
@@ -12,7 +12,6 @@ interface HorizonRecord {
   amount?: string;
   num_accounts?: number;
   liquidity_pools_amount?: string;
-  // pool fields
   id?: string;
   fee_bp?: number;
   total_trustlines?: string;
@@ -22,7 +21,6 @@ interface HorizonRecord {
 
 export async function GET() {
   try {
-    // Fetch all asset pages (up to 5 pages / 1000 assets)
     const allAssets: HorizonRecord[] = [];
     let assetUrl: string | null = `${TESTNET_HORIZON}/assets?limit=200&order=desc`;
     let pages = 0;
