@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plug, Loader2, CheckCircle, AlertCircle, X } from 'lucide-react';
 import { usePiNetwork } from '@/context/PiNetworkContext';
+import PiSignInButton from '@/components/social/PiSignInButton';
 
 interface MobilePiWelcomeProps {
   onAuthSuccess?: (user: any) => void;
@@ -198,6 +199,17 @@ export function MobilePiWelcome({ onAuthSuccess, onClose }: MobilePiWelcomeProps
                   </>
                 )}
               </Button>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">or</span>
+                </div>
+              </div>
+
+              <PiSignInButton variant="secondary" size="md" className="w-full" />
               
               <Button 
                 onClick={handleSkip}

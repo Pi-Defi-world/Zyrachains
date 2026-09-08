@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { FiX } from "react-icons/fi";
 import { Menu, Plug, CheckCircle, ChevronDown } from "lucide-react";
 import { usePiNetwork } from "@/context/PiNetworkContext";
+import PiSignInButton from '@/components/social/PiSignInButton';
 import Logo from './logo';
 import { ModeToggle } from '@/components/ui/mode-toggle';
 import { GlobalSearch } from '@/components/GlobalSearch';
@@ -117,6 +118,11 @@ const Navbar: React.FC = () => {
                     </span>
                     {isAuthenticated && <CheckCircle className="w-4 h-4" />}
                   </button>
+                  {!isAuthenticated && (
+                    <div className="mt-2">
+                      <PiSignInButton variant="outline" size="sm" className="w-full" />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

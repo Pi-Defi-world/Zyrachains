@@ -35,6 +35,22 @@ Common scripts:
 - **Oracle API**: `/api-dashboard` (key management + top-up), `/api-documentation`
 - **Zyra Social**: `/social/*` — feed, posts, profiles, tokens, badges, leaderboard, moderation, ads
 
+## Authentication
+
+Two authentication methods are supported:
+
+### Pi SDK Auth (Pi Browser only)
+- Uses `Pi.authenticate()` via Pi Browser SDK
+- Required for payments and full functionality
+- Triggered via "Connect Pi Wallet" button
+
+### Pi Sign-In (Any browser)
+- OAuth 2.0 implicit flow via `accounts.pinet.com`
+- Works in Chrome, Safari, Firefox — not just Pi Browser
+- Triggered via "Sign in with Pi" button
+- Callback route: `/signin/callback`
+- Client ID configured via `NEXT_PUBLIC_PI_SIGNIN_CLIENT_ID`
+
 ## Zyra Social
 
 The social platform is a full engagement layer backed by the `Zyrachain-server` API.
@@ -53,19 +69,60 @@ The social platform is a full engagement layer backed by the `Zyrachain-server` 
 | `/social/moderation` | Community moderation queue + voting |
 | `/social/ads` | Earn ZP via custom ads or Pi rewarded ads |
 
+### Pi Ads Integration
+
+All three Pi ad types are integrated into the social feed:
+
+| Ad Type | Placement | Reward | Verification |
+|---------|-----------|--------|-------------|
+| **Interstitial** | Between posts (every 5th) | 2 ZP | Time-based |
+| **Rewarded** | Between posts (every 3rd) + after comments (every 5th) | 5 ZP | Pi Platform API |
+| **Banner** | Bottom of social layout | None (dev revenue) | N/A |
+| **Custom** | `/social/ads` page | 0.5 ZP (varies) | Backend tracked |
+
+Cooldowns: 3 minutes between rewarded ads, 10/day max.
+
 ### Key Files
 
 - `context/SocialContext.tsx` — global social state (balance, XP, feed, actions)
 - `lib/social-api-client.ts` — typed client for `/api/social/*`
 - `lib/pi-ads-service.ts` — Pi Browser SDK ads (interstitial / rewarded + verification)
-- `components/social/*` — PostCard, PostComposer, AdCard/AdPlayer, TipModal, BoostModal, MissionsPanel, XPBar, TokenBalance, etc.
+- `lib/pi-signin.ts` — OAuth sign-in flow (URL builder, state, callback parsing)
+- `lib/pi-local-storage.ts` — Pi localStorage wrapper with fallback
+- `lib/pi-staking.ts` — Staking data fetch + tier display
+- `lib/pi-share.ts` — File sharing wrapper (Pi.shareFile + Web Share API)
+- `components/social/ads/*` — AdCooldownContext, InterstitialAd, RewardedAdCard, BannerAd, usePiAds
+- `components/social/*` — PostCard, PostComposer, AdCard/AdPlayer, TipModal, BoostModal, MissionsPanel, XPBar, TokenBalance, PiSignInButton, etc.
 
 ### Interaction Model (ZP tokens)
 
 - Creating posts and comments is **free**.
 - Like / dislike cost **0.1 ZP**, reshare **0.5 ZP**.
 - Tips (min **1 ZP**) and boosts (min **10 ZP**) send ~80% to the creator; 20% platform fee.
-- Watch ads to earn ZP (custom campaigns + Pi rewarded ads = **5 ZP** each).
+- Watch ads to earn ZP:
+  - Interstitial ads: **2 ZP** per view
+  - Rewarded ads: **5 ZP** per view (Pi verified)
+  - Custom campaigns: **0.5 ZP** per view
+
+## New Pi Capabilities
+
+| Capability | Status | Description |
+|-----------|--------|-------------|
+| Pi Sign-In | Active | OAuth 2.0 login from any browser |
+| Local Storage | Whitelist required | Store preferences on device via Pi Browser |
+| Staking Data API | Whitelist required | Display user's effective stake for Zyrachain |
+| Pi.shareFile | Whitelist required | Native file/video sharing from the app |
+
+## Environment Variables
+
+See `.env.example` for full list. Key variables:
+
+```
+NEXT_PUBLIC_PI_SIGNIN_CLIENT_ID=    # Pi Sign-In OAuth client ID
+NEXT_PUBLIC_PI_SANDBOX=             # true for testnet
+NEXT_PUBLIC_SERVER_URL=             # Backend API URL
+NEXT_PUBLIC_TESTNET_HORIZON_URL=    # Testnet Horizon endpoint
+```
 
 ## Architecture Notes
 
