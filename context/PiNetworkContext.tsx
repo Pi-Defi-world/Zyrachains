@@ -37,6 +37,7 @@ interface PiNetworkContextType {
   
   // Authentication methods
   authenticate: () => Promise<PiAuthResult>;
+  signInWithPi: () => void;
   syncUser: () => Promise<PiUser | null>;
   refreshUser: () => Promise<void>;
   ensurePiAuthentication: () => Promise<PiAuthResult>;
@@ -452,6 +453,10 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
     accessToken,
     isLoading,
     authenticate,
+    signInWithPi: () => {
+      const { initiatePiSignIn } = require('@/lib/pi-signin');
+      initiatePiSignIn();
+    },
     syncUser,
     refreshUser,
     ensurePiAuthentication,
