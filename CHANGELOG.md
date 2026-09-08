@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `lib/pi-signin.ts` — OAuth URL builder, state management (CSRF), callback parsing, `/v2/me` fetch.
   - Works in any browser (Chrome, Safari, Firefox) — not just Pi Browser.
   - Client ID configured via `NEXT_PUBLIC_PI_SIGNIN_CLIENT_ID`.
-  - Added to `MobilePiWelcome` modal, `navbar` mobile menu, and social pages.
+  - **PiSignInButton added to all pages with Pi SDK auth**: profile, api-dashboard, api-dashboard/topup, oracle-api, DonationModal, mobile welcome modal, navbar, and all social pages (badges, tokens, leaderboard, moderation, ads).
 
 - **Pi Ads in Social Feed**
   - Interstitial ads between posts (every 5th, 2 ZP reward).
@@ -42,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Social layout has persistent bottom banner ad.
 - `PiNetworkContext` now exposes `signInWithPi()` method alongside `authenticate()`.
 - All env files updated with Pi Sign-In client IDs.
+- Added `turbopack: {}` to `next.config.ts` for Next.js 16 compatibility.
 
 ## [0.1.0] - 2026-08-12
 

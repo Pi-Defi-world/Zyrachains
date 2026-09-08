@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  turbopack: {},
+
   // Disable Fast Refresh logs in development
   onDemandEntries: {
     // Period (in ms) where the server will keep pages in the buffer

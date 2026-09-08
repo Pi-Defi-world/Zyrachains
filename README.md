@@ -51,6 +51,16 @@ Two authentication methods are supported:
 - Callback route: `/signin/callback`
 - Client ID configured via `NEXT_PUBLIC_PI_SIGNIN_CLIENT_ID`
 
+**Placement** — `PiSignInButton` appears alongside every "Connect Pi Wallet" prompt:
+- MobilePiWelcome modal (with "or" divider)
+- Navbar mobile menu
+- Profile page header
+- API Dashboard auth gate
+- API Dashboard Top-up auth gate
+- Oracle API auth gate
+- DonationModal (on connect error)
+- Social pages: badges, tokens, leaderboard, moderation, ads (not-authenticated state)
+
 ## Zyra Social
 
 The social platform is a full engagement layer backed by the `Zyrachain-server` API.
