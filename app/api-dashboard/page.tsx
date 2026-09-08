@@ -8,6 +8,7 @@ import {
   Card, CardContent, CardDescription, CardHeader, CardTitle
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import PiSignInButton from '@/components/social/PiSignInButton';
 import { Badge } from '@/components/ui/badge';
 import {
   Key, Activity, Clock, BarChart3, Trash2, ExternalLink,
@@ -166,7 +167,10 @@ export default function ApiDashboardPage() {
             <CardContent className="py-8 text-center">
               <Key className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
               <p className="text-muted-foreground mb-3">Connect your Pi Wallet to view and manage your API keys.</p>
-              <Button onClick={() => authenticate()}>Connect Pi Wallet</Button>
+              <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                <Button onClick={() => authenticate()}>Connect Pi Wallet</Button>
+                <PiSignInButton variant="outline" size="md" />
+              </div>
             </CardContent>
           </Card>
         )}

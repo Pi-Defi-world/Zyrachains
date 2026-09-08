@@ -7,6 +7,7 @@ import { useLanguage } from '@/context/languagecontext';
 import { useToast } from '@/components/context/ToastContext';
 import { socialAPI } from '@/lib/social-api-client';
 import { PiAdsService } from '@/lib/pi-ads-service';
+import PiSignInButton from '@/components/social/PiSignInButton';
 import AdCard from '@/components/social/AdCard';
 import AdPlayer from '@/components/social/AdPlayer';
 import { Play, Video, Clock, Coins, ExternalLink } from 'lucide-react';
@@ -83,7 +84,7 @@ export default function AdsPage() {
   };
 
   if (!isAuthenticated) {
-    return <div className="text-center py-20"><p className="text-muted-foreground">{t('social.connect_earn')}</p></div>;
+    return <div className="text-center py-20 space-y-3"><p className="text-muted-foreground">{t('social.connect_earn')}</p><PiSignInButton variant="secondary" size="sm" /></div>;
   }
 
   if (loading) {

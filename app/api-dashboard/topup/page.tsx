@@ -6,6 +6,7 @@ import { usePageMetadata } from '@/context/pagemetadataContext';
 import { usePiNetwork } from '@/context/PiNetworkContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import PiSignInButton from '@/components/social/PiSignInButton';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Zap, Coins, ArrowLeft, CheckCircle, AlertCircle, Key } from 'lucide-react';
 
@@ -100,7 +101,10 @@ export default function TopUpCreditsPage() {
             <CardContent className="py-8 text-center">
               <Key className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
               <p className="text-muted-foreground mb-3">Connect your Pi Wallet to top up credits.</p>
-              <Button onClick={() => authenticate()}>Connect Pi Wallet</Button>
+              <div className="flex flex-col gap-2 justify-center">
+                <Button onClick={() => authenticate()}>Connect Pi Wallet</Button>
+                <PiSignInButton variant="outline" size="md" />
+              </div>
             </CardContent>
           </Card>
         </div>

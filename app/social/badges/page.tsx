@@ -6,6 +6,7 @@ import { usePiNetwork } from '@/context/PiNetworkContext';
 import { useLanguage } from '@/context/languagecontext';
 import { socialAPI } from '@/lib/social-api-client';
 import BadgeDisplay from '@/components/social/BadgeDisplay';
+import PiSignInButton from '@/components/social/PiSignInButton';
 import { Award, ShoppingCart, Shield, Star } from 'lucide-react';
 
 export default function BadgesPage() {
@@ -50,8 +51,9 @@ export default function BadgesPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="text-center py-20">
+      <div className="text-center py-20 space-y-3">
         <p className="text-gray-500">{t('social.connect_badges')}</p>
+        <PiSignInButton variant="secondary" size="sm" />
       </div>
     );
   }

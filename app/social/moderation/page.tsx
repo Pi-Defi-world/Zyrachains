@@ -5,6 +5,7 @@ import { usePiNetwork } from '@/context/PiNetworkContext';
 import { useLanguage } from '@/context/languagecontext';
 import { socialAPI } from '@/lib/social-api-client';
 import PostCard from '@/components/social/PostCard';
+import PiSignInButton from '@/components/social/PiSignInButton';
 import { Shield, Flag, CheckCircle, Loader2 } from 'lucide-react';
 
 export default function ModerationPage() {
@@ -60,8 +61,9 @@ export default function ModerationPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="text-center py-20">
+      <div className="text-center py-20 space-y-3">
         <p className="text-gray-500">{t('social.connect_moderate')}</p>
+        <PiSignInButton variant="secondary" size="sm" />
       </div>
     );
   }

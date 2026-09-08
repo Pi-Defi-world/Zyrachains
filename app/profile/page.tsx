@@ -10,6 +10,7 @@ import DonationModal from '@/components/DonationModal';
 import BadgeDisplay from '@/components/social/BadgeDisplay';
 import Avatar from '@/components/social/Avatar';
 import ReferralCard from '@/components/social/ReferralCard';
+import PiSignInButton from '@/components/social/PiSignInButton';
 import {
   Plug,
   Settings,
@@ -349,6 +350,7 @@ const ProfilePage: React.FC = () => {
                   : isAuthenticated && user?.username 
                     ? `@${user.username}` 
                     : (
+                      <>
                       <button
                         onClick={() => authenticate().catch(() => setShowComingSoonModal(true))}
                         className="text-base sm:text-lg font-semibold text-foreground hover:underline flex items-center gap-2"
@@ -356,6 +358,10 @@ const ProfilePage: React.FC = () => {
                         <Plug className="h-4 w-4 text-primary flex-shrink-0" />
                         Connect Pi Wallet
                       </button>
+                      <div className="mt-2">
+                        <PiSignInButton variant="outline" size="sm" />
+                      </div>
+                      </>
                     )
                 }
               </div>

@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { usePiNetwork } from '@/context/PiNetworkContext';
+import PiSignInButton from '@/components/social/PiSignInButton';
 import { Heart, X, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface DonationModalProps {
@@ -172,9 +173,14 @@ export default function DonationModal({ isOpen, onClose, onSuccess }: DonationMo
           )}
 
           {error && (
-            <div className="flex items-center gap-2 text-red-500 text-sm bg-red-50 dark:bg-red-950/20 p-3 rounded-lg border border-red-200 dark:border-red-800">
-              <AlertCircle className="h-4 w-4 flex-shrink-0" />
-              <span>{error}</span>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-red-500 text-sm bg-red-50 dark:bg-red-950/20 p-3 rounded-lg border border-red-200 dark:border-red-800">
+                <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                <span>{error}</span>
+              </div>
+              {error.includes('connect') && (
+                <PiSignInButton variant="secondary" size="sm" className="w-full" />
+              )}
             </div>
           )}
 

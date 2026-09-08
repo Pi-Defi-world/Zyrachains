@@ -6,6 +6,7 @@ import { usePiNetwork } from '@/context/PiNetworkContext';
 import { useLanguage } from '@/context/languagecontext';
 import { socialAPI } from '@/lib/social-api-client';
 import TokenBalance from '@/components/social/TokenBalance';
+import PiSignInButton from '@/components/social/PiSignInButton';
 import { Coins, ArrowUpRight, ArrowDownLeft, Clock } from 'lucide-react';
 
 export default function TokensPage() {
@@ -33,8 +34,9 @@ export default function TokensPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="text-center py-20">
+      <div className="text-center py-20 space-y-3">
         <p className="text-gray-500">{t('social.connect_tokens')}</p>
+        <PiSignInButton variant="secondary" size="sm" />
       </div>
     );
   }

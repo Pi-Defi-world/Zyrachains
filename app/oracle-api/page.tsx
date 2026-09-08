@@ -6,6 +6,7 @@ import { usePageMetadata } from '@/context/pagemetadataContext';
 import { usePiNetwork } from '@/context/PiNetworkContext';
 import { LISTING_PAYMENTS } from '@/lib/pi-network';
 import { Button } from '@/components/ui/button';
+import PiSignInButton from '@/components/social/PiSignInButton';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -149,9 +150,12 @@ export default function OracleApiPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             {!isAuthenticated && (
-              <Button onClick={() => authenticate()} className="w-full sm:w-auto">
-                Connect Pi Wallet
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button onClick={() => authenticate()} className="w-full sm:w-auto">
+                  Connect Pi Wallet
+                </Button>
+                <PiSignInButton variant="outline" size="md" />
+              </div>
             )}
             {isAuthenticated && (
               <>
