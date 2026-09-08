@@ -7,6 +7,7 @@ import PostCard from '@/components/social/PostCard';
 import { useSocial } from '@/context/SocialContext';
 import { useLanguage } from '@/context/languagecontext';
 import { useToast } from '@/components/context/ToastContext';
+import { AdCooldownProvider, RewardedAdCard } from '@/components/social/ads';
 import { Loader2, Send, Link2 } from 'lucide-react';
 
 export default function PostDetailPage() {
@@ -76,6 +77,7 @@ export default function PostDetailPage() {
   }
 
   return (
+    <AdCooldownProvider>
     <div className="pb-20 sm:pb-0">
       <PostCard post={post} detail />
 
@@ -101,17 +103,20 @@ export default function PostDetailPage() {
           <p className="text-xs text-muted-foreground text-center py-4">{t('social.comments_empty')}</p>
         ) : (
           <div className="space-y-2">
-            {comments.map((comment: any) => (
-              <div key={comment._id} className="bg-card border border-border rounded-lg p-3">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center text-accent-foreground font-bold text-[10px]">
-                    {(comment.author_username || comment.author_uid)?.slice(0, 1).toUpperCase()}
+            {comments.map((comment: any, commentIndex: number) => (
+              <React.Fragment key={comment._id}>
+                <div className="bg-card border border-border rounded-lg p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center text-accent-foreground font-bold text-[10px]">
+                      {(comment.author_username || comment.author_uid)?.slice(0, 1).toUpperCase()}
+                    </div>
+                    <span className="text-xs font-medium text-foreground">{comment.author_username || comment.author_uid?.slice(0, 8)}</span>
+                    <span className="text-[10px] text-muted-foreground">{new Date(comment.createdAt).toLocaleDateString()}</span>
                   </div>
-                  <span className="text-xs font-medium text-foreground">{comment.author_username || comment.author_uid?.slice(0, 8)}</span>
-                  <span className="text-[10px] text-muted-foreground">{new Date(comment.createdAt).toLocaleDateString()}</span>
+                  <p className="text-sm text-foreground/85 ml-8">{comment.content}</p>
                 </div>
-                <p className="text-sm text-foreground/85 ml-8">{comment.content}</p>
-              </div>
+                {(commentIndex + 1) % 5 === 0 && <RewardedAdCard variant="comment" />}
+              </React.Fragment>
             ))}
           </div>
         )}
@@ -130,5 +135,6 @@ export default function PostDetailPage() {
         </div>
       )}
     </div>
+    </AdCooldownProvider>
   );
 }

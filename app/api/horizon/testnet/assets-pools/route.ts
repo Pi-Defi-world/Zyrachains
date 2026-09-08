@@ -46,7 +46,7 @@ export async function GET() {
     let source = 'suban';
 
     while (assetUrl && pages < 5) {
-      const result = await fetchWithFallback<{ _embedded?: { records?: HorizonRecord[] }; _links?: { next?: { href?: string } } }>(
+      const result: { data: { _embedded?: { records?: HorizonRecord[] }; _links?: { next?: { href?: string } } }; source: string } | null = await fetchWithFallback<{ _embedded?: { records?: HorizonRecord[] }; _links?: { next?: { href?: string } } }>(
         assetUrl,
         assetUrl.replace(TESTNET_HORIZON, PI_TESTNET_FALLBACK)
       );

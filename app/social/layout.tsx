@@ -5,6 +5,7 @@ import SocialNav from '@/components/social/SocialNav';
 import TokenBalance from '@/components/social/TokenBalance';
 import XPBar from '@/components/social/XPBar';
 import EcosystemWidget from '@/components/social/EcosystemWidget';
+import { BannerAd } from '@/components/social/ads';
 
 export default function SocialLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -22,6 +23,7 @@ export default function SocialLayout({ children }: { children: React.ReactNode }
         </div>
         {children}
       </div>
+      <BannerAd />
     </div>
   );
 }

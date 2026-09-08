@@ -10,6 +10,7 @@ import PostComposer from './PostComposer';
 import FeedTabs from './FeedTabs';
 import BadgeDisplay from './BadgeDisplay';
 import EcosystemWidget from './EcosystemWidget';
+import { AdCooldownProvider, InterstitialAd, RewardedAdCard } from './ads';
 import { Plus, Loader2, Trophy, Medal, Zap, Award } from 'lucide-react';
 
 export default function FeedView() {
@@ -70,6 +71,7 @@ export default function FeedView() {
   };
 
   return (
+    <AdCooldownProvider>
     <div>
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-heading-sm text-foreground lg:hidden">{t('social.feed')}</h1>
@@ -162,7 +164,13 @@ export default function FeedView() {
       ) : feed.length === 0 && !feedLoading ? (
         <div className="text-center py-12"><p className="text-sm text-muted-foreground">{t('social.noPosts')}</p></div>
       ) : (
-        <>{feed.map((post) => (<PostCard key={post._id} post={post} />))}</>
+        <>{feed.map((post, index) => (
+          <React.Fragment key={post._id}>
+            <PostCard post={post} />
+            {index > 0 && (index + 1) % 5 === 0 && <InterstitialAd />}
+            {index > 0 && (index + 1) % 3 === 0 && (index + 1) % 5 !== 0 && <RewardedAdCard />}
+          </React.Fragment>
+        ))}</>
       )}
 
       {feedType !== 'leaderboard' && (
@@ -174,5 +182,6 @@ export default function FeedView() {
 
       {showComposer && <PostComposer onClose={() => setShowComposer(false)} />}
     </div>
+    </AdCooldownProvider>
   );
 }
