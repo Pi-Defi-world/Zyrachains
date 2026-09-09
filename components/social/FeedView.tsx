@@ -10,7 +10,7 @@ import PostComposer from './PostComposer';
 import FeedTabs from './FeedTabs';
 import BadgeDisplay from './BadgeDisplay';
 import EcosystemWidget from './EcosystemWidget';
-import { AdCooldownProvider, InterstitialAd, RewardedAdCard } from './ads';
+import { AdCooldownProvider, RewardedAdCard } from './ads';
 import { Plus, Loader2, Trophy, Medal, Zap, Award } from 'lucide-react';
 
 export default function FeedView() {
@@ -167,8 +167,7 @@ export default function FeedView() {
         <>{feed.map((post, index) => (
           <React.Fragment key={post._id}>
             <PostCard post={post} />
-            {index > 0 && (index + 1) % 5 === 0 && <InterstitialAd />}
-            {index > 0 && (index + 1) % 3 === 0 && (index + 1) % 5 !== 0 && <RewardedAdCard />}
+            {index > 0 && (index + 1) % 3 === 0 && <RewardedAdCard />}
           </React.Fragment>
         ))}</>
       )}

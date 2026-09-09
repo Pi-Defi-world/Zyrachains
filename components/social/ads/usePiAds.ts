@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-export type AdType = 'interstitial' | 'rewarded' | 'banner';
+export type AdType = 'rewarded' | 'banner';
 
 interface PiAdsState {
   isSupported: boolean;
@@ -37,16 +37,6 @@ export function usePiAds() {
     check();
     return () => { mounted = false; };
   }, []);
-
-  const showInterstitial = useCallback(async (): Promise<boolean> => {
-    if (!state.isSupported) return false;
-    try {
-      const result = await (window as any).Pi.Ads?.showAd?.('interstitial');
-      return result?.result === 'AD_CLOSED';
-    } catch {
-      return false;
-    }
-  }, [state.isSupported]);
 
   const showRewarded = useCallback(async (): Promise<{ adId: string; rewarded: boolean } | null> => {
     if (!state.isSupported) return null;
@@ -85,5 +75,5 @@ export function usePiAds() {
     }
   }, []);
 
-  return { ...state, showInterstitial, showRewarded, verifyRewarded };
+  return { ...state, showRewarded, verifyRewarded };
 }
