@@ -1,0 +1,1 @@
+{"version":3,"file":"binance.d.ts","sourceRoot":"","sources":["../../../oracle/sources/binance.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,WAAW,EAAE,SAAS,EAAe,MAAM,UAAU,CAAC;AAG/D,qBAAa,aAAc,SAAQ,WAAW;IAC5C,OAAO,CAAC,OAAO,CAAoC;IAE7C,UAAU,IAAI,OAAO,CAAC,SAAS,CAAC;CAkCvC"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"coinmarketcap.d.ts","sourceRoot":"","sources":["../../../oracle/sources/coinmarketcap.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,WAAW,EAAE,SAAS,EAAe,MAAM,UAAU,CAAC;AAG/D,qBAAa,mBAAoB,SAAQ,WAAW;IAClD,OAAO,CAAC,OAAO,CAA0C;IAEnD,UAAU,IAAI,OAAO,CAAC,SAAS,CAAC;CAsDvC"}

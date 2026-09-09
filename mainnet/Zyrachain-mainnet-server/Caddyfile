@@ -1,0 +1,12 @@
+{
+  admin off
+}
+
+http://server.zyrachain.org {
+  reverse_proxy backend:4000
+}
+
+# Default site
+:80 {
+  reverse_proxy backend:4000
+}

@@ -1,0 +1,1 @@
+{"version":3,"file":"bitget.d.ts","sourceRoot":"","sources":["../../../oracle/sources/bitget.ts"],"names":[],"mappings":"AAIA,OAAO,EAAE,WAAW,EAAE,SAAS,EAAe,MAAM,UAAU,CAAC;AAG/D,qBAAa,YAAa,SAAQ,WAAW;IAC3C,OAAO,CAAC,OAAO,CAA8C;IAEvD,UAAU,IAAI,OAAO,CAAC,SAAS,CAAC;CAgDvC"}

@@ -1,0 +1,13 @@
+.git
+node_modules
+dist
+.env
+.env.local
+.env.*.local
+*.md
+.gitignore
+.eslint*
+.prettier*
+tsconfig.tsbuildinfo
+.mongo-dump
+created_wallets.csv

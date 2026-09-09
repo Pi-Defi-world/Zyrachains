@@ -1,0 +1,1 @@
+{"version":3,"file":"AdView.d.ts","sourceRoot":"","sources":["../../../../zyrachain-lib/lib/models/AdView.ts"],"names":[],"mappings":"AAAA,OAAO,QAAQ,EAAE,EAAU,QAAQ,EAAE,MAAM,UAAU,CAAC;AAEtD,MAAM,WAAW,OAAQ,SAAQ,QAAQ;IACvC,QAAQ,EAAE,MAAM,CAAC;IACjB,KAAK,EAAE,QAAQ,CAAC,KAAK,CAAC,QAAQ,CAAC;IAC/B,aAAa,EAAE,MAAM,CAAC;IACtB,SAAS,EAAE,IAAI,CAAC;CACjB;;AA8BD,wBAAyF"}

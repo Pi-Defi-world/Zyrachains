@@ -1,0 +1,1 @@
+{"version":3,"file":"snapshotStore.d.ts","sourceRoot":"","sources":["../../../services/snapshots/snapshotStore.ts"],"names":[],"mappings":"AAIA,wBAAsB,kBAAkB,CAAC,CAAC,EAAE,EAAE,EAAE,MAAM,GAAG,OAAO,CAAC;IAC/D,OAAO,EAAE,CAAC,CAAC;IACX,SAAS,EAAE,IAAI,CAAC;CACjB,GAAG,IAAI,CAAC,CAQR;AAED,wBAAsB,cAAc,CAAC,EAAE,EAAE,MAAM,EAAE,OAAO,EAAE,OAAO,GAAG,OAAO,CAAC,IAAI,CAAC,CAMhF"}

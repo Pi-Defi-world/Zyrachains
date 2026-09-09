@@ -1,0 +1,99 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __importDefault(require("mongoose"));
+const StartupListingSchema = new mongoose_1.default.Schema({
+    name: {
+        type: String,
+        required: true,
+        trim: true,
+        maxlength: 100,
+        unique: true
+    },
+    category: {
+        type: String,
+        required: true,
+        enum: [
+            'DeFi', 'Gaming', 'NFT/Metaverse', 'Social', 'Marketplace',
+            'Tools', 'Education', 'Entertainment', 'Productivity',
+            'FinTech', 'Healthcare', 'Supply Chain', 'Identity', 'IoT', 'Other'
+        ]
+    },
+    description: {
+        type: String,
+        required: true,
+        trim: true,
+        maxlength: 500
+    },
+    stage: {
+        type: String,
+        required: true,
+        enum: ['Idea Stage', 'Prototype', 'MVP', 'Beta Testing', 'Pre-Launch', 'Early Access']
+    },
+    email: {
+        type: String,
+        required: true,
+        trim: true,
+        lowercase: true,
+        validate: {
+            validator: function (v) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+            },
+            message: 'Invalid email format'
+        }
+    },
+    website: {
+        type: String,
+        trim: true,
+        validate: {
+            validator: function (v) {
+                if (!v)
+                    return true;
+                return /^https?:\/\/.+\..+/.test(v);
+            },
+            message: 'Invalid website URL format'
+        }
+    },
+    piWalletAddress: {
+        type: String,
+        trim: true,
+        validate: {
+            validator: function (v) {
+                if (!v)
+                    return true;
+                return /^G[A-Z0-9]{55}$/.test(v);
+            },
+            message: 'Invalid Pi wallet address format'
+        }
+    },
+    status: {
+        type: String,
+        required: true,
+        enum: ['pending', 'approved', 'rejected'],
+        default: 'pending'
+    },
+    submittedAt: {
+        type: Date,
+        default: Date.now
+    },
+    approvedAt: {
+        type: Date
+    },
+    featured: {
+        type: Boolean,
+        default: false
+    }
+}, {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+});
+StartupListingSchema.index({ category: 1 });
+StartupListingSchema.index({ stage: 1 });
+StartupListingSchema.index({ status: 1 });
+StartupListingSchema.index({ submittedAt: -1 });
+StartupListingSchema.index({ featured: -1, submittedAt: -1 });
+exports.default = mongoose_1.default.models.StartupListing || mongoose_1.default.model('StartupListing', StartupListingSchema);
+//# sourceMappingURL=StartupListing.js.map

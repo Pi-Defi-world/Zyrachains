@@ -1,0 +1,1 @@
+{"version":3,"file":"buildLatestTrades.d.ts","sourceRoot":"","sources":["../../../services/snapshots/buildLatestTrades.ts"],"names":[],"mappings":"AAGA,MAAM,WAAW,mBAAmB;IAClC,OAAO,EAAE,OAAO,EAAE,CAAC;IACnB,YAAY,CAAC,EAAE,MAAM,CAAC,MAAM,EAAE,OAAO,CAAC,CAAC;IACvC,SAAS,EAAE,MAAM,CAAC;CACnB;AAED,wBAAsB,iBAAiB,CAAC,KAAK,SAAK,GAAG,OAAO,CAAC,mBAAmB,CAAC,CAahF"}

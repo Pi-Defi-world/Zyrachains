@@ -1,0 +1,1 @@
+{"version":3,"file":"bitfinex.d.ts","sourceRoot":"","sources":["../../../oracle/sources/bitfinex.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,WAAW,EAAE,SAAS,EAAe,MAAM,UAAU,CAAC;AAG/D,qBAAa,cAAe,SAAQ,WAAW;IAC7C,OAAO,CAAC,OAAO,CAAqC;IAE9C,UAAU,IAAI,OAAO,CAAC,SAAS,CAAC;CAqCvC"}

@@ -1,0 +1,93 @@
+title: Zyrachain Backend Server
+description: Express API backend for Zyrachains
+output_file: .env
+
+fixed_values:
+  - name: UID
+    detect: uid
+
+fields:
+  - name: NODE_ENV
+    label: Node environment
+    type: select
+    default: production
+    options:
+      - value: production
+        label: Production
+      - value: development
+        label: Development
+
+  - name: SERVER_PORT
+    label: Server port
+    type: number
+    default: 4000
+    required: true
+
+  - name: MONGODB_URI
+    label: MongoDB connection URI
+    type: text
+    required: true
+
+  - name: JWT_SECRET
+    label: JWT secret
+    type: password
+    required: true
+
+  - name: JWT_EXPIRES_IN
+    label: JWT expiry
+    type: text
+    default: 7d
+
+  - name: PI_NETWORK_API_KEY
+    label: Pi Network API key
+    type: password
+
+  - name: PI_NETWORK_APP_ID
+    label: Pi Network App ID
+    type: text
+
+  - name: PI_ENV
+    label: Pi Network environment
+    type: select
+    default: sandbox
+    options:
+      - value: sandbox
+        label: Sandbox
+        set:
+          PI_SANDBOX_MODE: "true"
+      - value: mainnet
+        label: Mainnet
+        set:
+          PI_SANDBOX_MODE: "false"
+
+  - name: FRONTEND_URL
+    label: Frontend URL
+    type: text
+    default: "http://localhost:8000"
+    required: true
+
+  - name: APP_URL
+    label: App public URL
+    type: text
+    default: "http://localhost:8000"
+
+  - name: SMTP_HOST
+    label: SMTP host
+    type: text
+
+  - name: SMTP_PORT
+    label: SMTP port
+    type: number
+    default: 587
+
+  - name: SMTP_USER
+    label: SMTP username
+    type: text
+
+  - name: SMTP_PASS
+    label: SMTP password
+    type: password
+
+  - name: SMTP_FROM
+    label: SMTP from address
+    type: text

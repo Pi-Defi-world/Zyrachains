@@ -1,0 +1,1 @@
+{"version":3,"file":"mexc.d.ts","sourceRoot":"","sources":["../../../oracle/sources/mexc.ts"],"names":[],"mappings":"AAKA,OAAO,EAAE,WAAW,EAAE,SAAS,EAAe,MAAM,UAAU,CAAC;AAG/D,qBAAa,UAAW,SAAQ,WAAW;IACzC,OAAO,CAAC,OAAO,CAAiC;IAE1C,UAAU,IAAI,OAAO,CAAC,SAAS,CAAC;CAuCvC"}

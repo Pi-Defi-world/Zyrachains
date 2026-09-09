@@ -1,0 +1,7 @@
+[[CURRENCIES]]
+code="USDP"
+issuer="GBCX7CGY3DI5XM5XDWD3TVNM4REG73ZYSLDFZSTW7MTRUFKS662HWSYS"
+name="USDP Stablecoin"
+desc="USDP is a decentralized stablecoin backed by Pi and USD-TEST (on testnet) or USDC (on mainnet), maintaining a 1:1 peg with USD. It provides a stable store of value and medium of exchange on the Pi Network."
+image="https://usdp-coin.com/usdp-logo.png"
+

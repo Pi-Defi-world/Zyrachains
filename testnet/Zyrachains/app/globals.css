@@ -1,0 +1,401 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+
+    /* Light mode: warm off-white background */
+    --background: 210 40% 98%;
+    --foreground: 210 11% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 210 11% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 11% 15%;
+
+    --primary: 210 11% 15%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Teal accent color for interactivity and emphasis */
+    --accent: 198 100% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 210 11% 20%;
+
+    --muted: 210 17% 82%;
+    --muted-foreground: 210 8% 45%;
+
+    --destructive: 0 84% 58%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Success, warning, and semantic colors */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --danger: 0 84% 58%;
+    --danger-foreground: 0 0% 100%;
+
+    --border: 210 15% 88%;
+    --input: 210 40% 96%;
+    --ring: 198 100% 45%;
+
+    --chart-1: 198 100% 45%;
+    --chart-2: 210 11% 25%;
+    --chart-3: 210 8% 45%;
+    --chart-4: 198 89% 55%;
+    --chart-5: 210 11% 35%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+}
+
+/* Dark mode: warm dark background with teal accents */
+.dark {
+  color-scheme: dark;
+
+  --background: 210 13% 11%;
+  --foreground: 210 17% 92%;
+
+  --card: 210 15% 15%;
+  --card-foreground: 210 17% 92%;
+
+  --popover: 210 13% 18%;
+  --popover-foreground: 210 17% 92%;
+
+  --primary: 210 17% 92%;
+  --primary-foreground: 210 13% 11%;
+
+  /* Teal accent for dark mode */
+  --accent: 198 100% 50%;
+  --accent-foreground: 210 13% 11%;
+
+  --secondary: 210 15% 25%;
+  --secondary-foreground: 210 17% 88%;
+
+  --muted: 210 8% 35%;
+  --muted-foreground: 210 8% 65%;
+
+  --destructive: 0 84% 58%;
+  --destructive-foreground: 0 0% 100%;
+
+  /* Success, warning, and semantic colors (dark mode) */
+  --success: 142 71% 50%;
+  --success-foreground: 210 13% 11%;
+  --warning: 38 92% 55%;
+  --warning-foreground: 210 13% 11%;
+  --danger: 0 84% 65%;
+  --danger-foreground: 0 0% 100%;
+
+  --border: 210 15% 25%;
+  --input: 210 15% 20%;
+  --ring: 198 100% 50%;
+
+  --chart-1: 198 100% 50%;
+  --chart-2: 210 17% 92%;
+  --chart-3: 210 8% 65%;
+  --chart-4: 198 89% 60%;
+  --chart-5: 210 17% 80%;
+}
+
+@layer components {
+  /* Typography utilities */
+  .text-heading-lg {
+    @apply text-2xl font-bold leading-tight tracking-tight;
+  }
+
+  .text-heading-md {
+    @apply text-xl font-bold leading-snug;
+  }
+
+  .text-heading-sm {
+    @apply text-lg font-semibold leading-snug;
+  }
+
+  /* Prominent data display */
+  .text-data-lg {
+    @apply font-mono text-3xl font-bold tracking-tight;
+  }
+
+  .text-data-md {
+    @apply font-mono text-2xl font-semibold;
+  }
+
+  .text-data-sm {
+    @apply font-mono text-base font-semibold;
+  }
+
+  /* Card utilities with shadow and rounded corners */
+  .card-elevated {
+    @apply rounded-lg border border-border bg-card shadow-sm transition-all hover:shadow-md;
+  }
+
+  /* Subtle card for secondary content */
+  .card-subtle {
+    @apply rounded-lg border border-border/50 bg-secondary/30;
+  }
+
+  /* Accent utilities */
+  .text-accent-strong {
+    @apply text-accent font-semibold;
+  }
+
+  .interactive-element {
+    @apply transition-colors duration-200;
+  }
+
+  /* Gradient/Morphic effects for soft blending */
+  .card-morphic {
+    @apply rounded-2xl bg-gradient-to-br from-card via-card to-card/95 border border-border/30 shadow-lg transition-all duration-300 hover:shadow-xl hover:border-border/60;
+  }
+
+  .gradient-accent {
+    @apply bg-gradient-to-r from-accent via-accent/90 to-accent/80;
+  }
+
+  .gradient-subtle {
+    @apply bg-gradient-to-br from-transparent via-card to-transparent;
+  }
+
+  .blur-glow {
+    @apply relative after:absolute after:inset-0 after:rounded-lg after:bg-gradient-to-br after:from-accent/10 after:via-transparent after:to-transparent after:blur-2xl after:-z-10;
+  }
+
+  /* Frosted glass morphism effect */
+  .glass-morphic {
+    @apply backdrop-blur-md bg-card/70 border border-white/10;
+  }
+
+  /* Semantic color utilities */
+  .text-success {
+    @apply text-[hsl(var(--success))];
+  }
+
+  .text-warning {
+    @apply text-[hsl(var(--warning))];
+  }
+
+  .bg-success {
+    @apply bg-[hsl(var(--success))];
+  }
+
+  .bg-warning {
+    @apply bg-[hsl(var(--warning))];
+  }
+
+  .text-gain {
+    @apply text-success font-semibold;
+  }
+
+  .text-loss {
+    @apply text-danger font-semibold;
+  }
+
+  /* Enhanced hover effects for cards */
+  .card-hover-lift {
+    @apply hover:scale-105 hover:shadow-lg transition-all duration-300;
+  }
+
+  .metric-card {
+    @apply card-hover-lift rounded-lg border border-border/30 bg-gradient-to-br from-card via-card to-card/95 p-4 sm:p-5;
+  }
+
+  /* Skeleton shimmer animation */
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+
+  .skeleton-shimmer {
+    @apply bg-gradient-to-r from-muted via-muted/70 to-muted;
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite linear;
+  }
+
+  /* Subtle background animations */
+  @keyframes gradient-shift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  .background-animated {
+    @apply fixed inset-0 -z-10 pointer-events-none;
+    background: linear-gradient(-45deg, hsl(var(--accent) / 0.05), hsl(var(--accent) / 0.02), hsl(var(--background)));
+    background-size: 400% 400%;
+    animation: gradient-shift 15s ease infinite;
+  }
+
+  .background-gradient-blob {
+    @apply absolute rounded-full blur-3xl opacity-20;
+  }
+
+  .background-blob-1 {
+    animation: float 20s ease-in-out infinite;
+  }
+
+  .background-blob-2 {
+    animation: float 25s ease-in-out infinite reverse;
+  }
+
+  /* Card type specific color tints for visual differentiation */
+  .card-accent-blue {
+    @apply bg-gradient-to-br from-card via-blue-50/5 to-card/95 dark:from-card dark:via-blue-950/10 dark:to-card/95;
+  }
+
+  .card-accent-green {
+    @apply bg-gradient-to-br from-card via-green-50/5 to-card/95 dark:from-card dark:via-green-950/10 dark:to-card/95;
+  }
+
+  .card-accent-orange {
+    @apply bg-gradient-to-br from-card via-orange-50/5 to-card/95 dark:from-card dark:via-orange-950/10 dark:to-card/95;
+  }
+
+  .card-accent-purple {
+    @apply bg-gradient-to-br from-card via-purple-50/5 to-card/95 dark:from-card dark:via-purple-950/10 dark:to-card/95;
+  }
+
+  /* Border tint variants */
+  .border-accent-blue {
+    @apply border-blue-300/50 dark:border-blue-700/30;
+  }
+
+  .border-accent-green {
+    @apply border-green-300/50 dark:border-green-700/30;
+  }
+
+  .border-accent-orange {
+    @apply border-orange-300/50 dark:border-orange-700/30;
+  }
+
+  .border-accent-purple {
+    @apply border-purple-300/50 dark:border-purple-700/30;
+  }
+
+  /* Dark mode specific gradient refinements for WCAG AA contrast */
+  .dark .card-accent-blue {
+    @apply bg-gradient-to-tl from-card via-blue-950/15 to-card;
+  }
+
+  .dark .card-accent-green {
+    @apply bg-gradient-to-tl from-card via-green-950/15 to-card;
+  }
+
+  .dark .card-accent-orange {
+    @apply bg-gradient-to-tl from-card via-orange-950/15 to-card;
+  }
+
+  .dark .card-accent-purple {
+    @apply bg-gradient-to-tl from-card via-purple-950/15 to-card;
+  }
+
+  /* Enhanced dark mode text contrast */
+  .dark .text-foreground {
+    @apply text-slate-100;
+  }
+
+  .dark .text-muted-foreground {
+    @apply text-slate-400;
+  }
+
+  /* ---- Live data-center animations ---- */
+
+  /* Value-change flash (CoinMarketCap-style tick highlight) */
+  @keyframes flash-up {
+    0% { background-color: hsl(var(--success) / 0.28); }
+    100% { background-color: transparent; }
+  }
+
+  @keyframes flash-down {
+    0% { background-color: hsl(var(--danger) / 0.28); }
+    100% { background-color: transparent; }
+  }
+
+  .flash-up {
+    animation: flash-up 0.9s ease-out;
+    border-radius: 0.25rem;
+  }
+
+  .flash-down {
+    animation: flash-down 0.9s ease-out;
+    border-radius: 0.25rem;
+  }
+
+  /* New row entrance flash for live feeds */
+  @keyframes row-enter {
+    0% { background-color: hsl(var(--accent) / 0.18); opacity: 0.4; }
+    100% { background-color: transparent; opacity: 1; }
+  }
+
+  .row-enter {
+    animation: row-enter 1.1s ease-out;
+  }
+
+  /* Continuous marquee for the live ticker strip */
+  @keyframes ticker-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .ticker-track {
+    display: inline-flex;
+    flex-shrink: 0;
+    animation: ticker-scroll 40s linear infinite;
+    will-change: transform;
+  }
+
+  .ticker-viewport:hover .ticker-track {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ticker-track {
+      animation: none;
+    }
+    .flash-up,
+    .flash-down,
+    .row-enter {
+      animation: none;
+    }
+  }
+}

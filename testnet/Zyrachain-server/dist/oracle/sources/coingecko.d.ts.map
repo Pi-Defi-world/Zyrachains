@@ -1,0 +1,1 @@
+{"version":3,"file":"coingecko.d.ts","sourceRoot":"","sources":["../../../oracle/sources/coingecko.ts"],"names":[],"mappings":"AAIA,OAAO,EAAE,WAAW,EAAE,SAAS,EAAe,MAAM,UAAU,CAAC;AAG/D,qBAAa,eAAgB,SAAQ,WAAW;IAC9C,OAAO,CAAC,OAAO,CAAsC;IAE/C,UAAU,IAAI,OAAO,CAAC,SAAS,CAAC;CAgDvC"}

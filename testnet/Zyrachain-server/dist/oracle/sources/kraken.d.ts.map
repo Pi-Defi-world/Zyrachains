@@ -1,0 +1,1 @@
+{"version":3,"file":"kraken.d.ts","sourceRoot":"","sources":["../../../oracle/sources/kraken.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,WAAW,EAAE,SAAS,EAAe,MAAM,UAAU,CAAC;AAG/D,qBAAa,YAAa,SAAQ,WAAW;IAC3C,OAAO,CAAC,OAAO,CAAqC;IAE9C,UAAU,IAAI,OAAO,CAAC,SAAS,CAAC;CAuCvC"}

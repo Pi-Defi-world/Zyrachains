@@ -1,0 +1,1 @@
+{"version":3,"file":"kucoin.d.ts","sourceRoot":"","sources":["../../../oracle/sources/kucoin.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,WAAW,EAAE,SAAS,EAAe,MAAM,UAAU,CAAC;AAG/D,qBAAa,YAAa,SAAQ,WAAW;IAC3C,OAAO,CAAC,OAAO,CAAmC;IAE5C,UAAU,IAAI,OAAO,CAAC,SAAS,CAAC;CAsCvC"}

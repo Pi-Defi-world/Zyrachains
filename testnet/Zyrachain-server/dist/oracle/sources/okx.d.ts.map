@@ -1,0 +1,1 @@
+{"version":3,"file":"okx.d.ts","sourceRoot":"","sources":["../../../oracle/sources/okx.ts"],"names":[],"mappings":"AAIA,OAAO,EAAE,WAAW,EAAE,SAAS,EAAe,MAAM,UAAU,CAAC;AAG/D,qBAAa,SAAU,SAAQ,WAAW;IACxC,OAAO,CAAC,OAAO,CAAgC;IAEzC,UAAU,IAAI,OAAO,CAAC,SAAS,CAAC;CAgDvC"}
