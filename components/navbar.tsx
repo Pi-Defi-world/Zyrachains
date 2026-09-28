@@ -37,6 +37,7 @@ const Navbar: React.FC = () => {
                 <Link href="/block" className="text-foreground/70 hover:text-foreground interactive-element">Explorer</Link>
                 <Link href="/contracts" className="text-foreground/70 hover:text-foreground interactive-element">Contracts</Link>
                 <Link href="/favorites" className="text-foreground/70 hover:text-foreground interactive-element">Favorites</Link>
+                <Link href="/claim" className="text-foreground/70 hover:text-foreground interactive-element">Claim Gift</Link>
                 <Link href="/pct-wallet-monitor" className="text-foreground/70 hover:text-foreground interactive-element">Monitors</Link>
                 <Link href="/social" className="text-foreground/70 hover:text-foreground interactive-element">Social</Link>
                 <Link href="/api-documentation" className="text-foreground/70 hover:text-foreground interactive-element">API</Link>
@@ -102,6 +103,9 @@ const Navbar: React.FC = () => {
                 </Link>
                 <Link href="/profile" className="block px-4 py-3 rounded-lg text-foreground/70 hover:text-foreground hover:bg-secondary interactive-element text-sm font-medium" onClick={() => setShowMobileMenu(false)}>
                   Profile
+                </Link>
+                <Link href="/claim" className="block px-4 py-3 rounded-lg text-foreground/70 hover:text-foreground hover:bg-secondary interactive-element text-sm font-medium" onClick={() => setShowMobileMenu(false)}>
+                  Claim Gift
                 </Link>
 
                 <div className="pt-6 border-t border-border mt-6">

@@ -1,7 +1,10 @@
 'use client';
 
 const PI_AUTH_URL = 'https://accounts.pinet.com/oauth/authorize';
-const PI_API_BASE = 'https://api.minepi.com/v2';
+const PI_API_BASE =
+  process.env.NEXT_PUBLIC_PI_SANDBOX === 'true' || process.env.NEXT_PUBLIC_PI_NETWORK === 'testnet'
+    ? 'https://api.testnet.minepi.com/v2'
+    : 'https://api.minepi.com/v2';
 
 export interface PiSignInConfig {
   clientId: string;
@@ -51,8 +54,12 @@ export async function fetchPiUser(accessToken: string): Promise<PiSignInUser> {
   });
   if (!res.ok) throw new Error(`Pi API error: ${res.status}`);
   const data = await res.json();
+  const uid = data.user_uid || data.uid;
+  if (typeof uid !== 'string' || typeof data.username !== 'string') {
+    throw new Error('Pi API returned an incomplete user');
+  }
   return {
-    uid: data.user_uid || data.uid,
+    uid,
     username: data.username,
     wallet_address: data.wallet_address,
   };
@@ -69,7 +76,7 @@ export function getSignInRedirectUri(): string {
   return `${origin}/signin/callback`;
 }
 
-export function initiatePiSignIn(): void {
+export function initiatePiSignIn(returnTo = '/social'): void {
   const clientId = getSignInClientId();
   if (!clientId) {
     console.error('Pi Sign-In client ID not configured');
@@ -77,6 +84,8 @@ export function initiatePiSignIn(): void {
   }
   const redirectUri = getSignInRedirectUri();
   const { url, state } = buildSignInUrl({ clientId, redirectUri });
+  const safeReturnTo = returnTo.startsWith('/') && !returnTo.startsWith('//') ? returnTo : '/social';
   sessionStorage.setItem('pi_oauth_state', state);
+  sessionStorage.setItem('pi_oauth_return_to', safeReturnTo);
   window.location.href = url;
 }

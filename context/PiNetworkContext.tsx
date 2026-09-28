@@ -168,6 +168,7 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
 
       const onIncompletePaymentFound = async (payment: any) => {
         console.log('⚠️ Incomplete payment found:', payment);
+        if (payment?.direction === 'app_to_user') return;
         const paymentId = payment.identifier;
         try {
           await fetch(`/api/pi/payments/cancel`, {
@@ -283,6 +284,7 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
     const auth = await (window as any).Pi.authenticate(
       ["username", "payments", "wallet_address"],
       async (payment: any) => {
+        if (payment?.direction === 'app_to_user') return;
         const paymentId = payment.identifier;
         await fetch(`/api/pi/payments/cancel`, {
           method: 'POST',

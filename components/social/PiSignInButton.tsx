@@ -8,9 +8,10 @@ interface PiSignInButtonProps {
   variant?: 'primary' | 'secondary' | 'outline';
   size?: 'sm' | 'md' | 'lg';
   onSuccess?: () => void;
+  returnTo?: string;
 }
 
-export default function PiSignInButton({ className = '', variant = 'primary', size = 'md' }: PiSignInButtonProps) {
+export default function PiSignInButton({ className = '', variant = 'primary', size = 'md', returnTo = '/social' }: PiSignInButtonProps) {
   const baseClasses = 'inline-flex items-center justify-center gap-2 font-semibold rounded-xl transition-all cursor-pointer';
   const sizeClasses = {
     sm: 'px-3 py-1.5 text-xs',
@@ -25,7 +26,7 @@ export default function PiSignInButton({ className = '', variant = 'primary', si
 
   return (
     <button
-      onClick={initiatePiSignIn}
+      onClick={() => initiatePiSignIn(returnTo)}
       className={`${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
     >
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">

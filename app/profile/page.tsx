@@ -36,6 +36,7 @@ import {
   TrendingUp,
   Compass,
   Heart,
+  Gift,
   Video,
   Shield,
   History,
@@ -293,6 +294,13 @@ const ProfilePage: React.FC = () => {
       description: ' ',
       icon: MessageCircle,
       href: '/contactUs',
+      showChevron: true
+    },
+    {
+      title: 'Claim Gift',
+      description: 'Claim a server-configured Pi gift',
+      icon: Gift,
+      href: '/claim',
       showChevron: true
     },
        {

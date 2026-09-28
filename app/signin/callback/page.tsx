@@ -14,6 +14,7 @@ export default function SignInCallbackPage() {
     const handleCallback = async () => {
       try {
         const storedState = sessionStorage.getItem('pi_oauth_state');
+        const returnTo = sessionStorage.getItem('pi_oauth_return_to') || '/social';
         const { accessToken, state, error } = parseCallbackFragment(window.location.hash);
 
         if (error) {
@@ -30,7 +31,7 @@ export default function SignInCallbackPage() {
           return;
         }
 
-        if (storedState && state && state !== storedState) {
+        if (!storedState || !state || state !== storedState) {
           setStatus('error');
           setMessage('Invalid state — possible CSRF attack');
           setTimeout(() => router.push('/'), 3000);
@@ -38,6 +39,7 @@ export default function SignInCallbackPage() {
         }
 
         sessionStorage.removeItem('pi_oauth_state');
+        sessionStorage.removeItem('pi_oauth_return_to');
 
         const user = await fetchPiUser(accessToken);
 
@@ -47,7 +49,8 @@ export default function SignInCallbackPage() {
         setStatus('success');
         setMessage(`Welcome, ${user.username}!`);
 
-        setTimeout(() => router.push('/social'), 1500);
+        const safeReturnTo = returnTo.startsWith('/') && !returnTo.startsWith('//') ? returnTo : '/social';
+        setTimeout(() => router.push(safeReturnTo), 1500);
       } catch (err) {
         console.error('Sign-in callback error:', err);
         setStatus('error');

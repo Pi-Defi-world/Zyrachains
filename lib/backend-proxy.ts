@@ -20,6 +20,7 @@ export async function fetchBackend(
     method,
     headers,
     body: opts.body ? JSON.stringify(opts.body) : undefined,
+    cache: 'no-store',
   });
 
   const text = await res.text();
